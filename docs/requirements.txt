@@ -1,0 +1,8 @@
+numpy>=1.21.0
+faiss-cpu>=1.7.0
+sentence-transformers>=2.2.0
+aiogram
+pandas
+openpyxl
+tkinterdnd2>=3.0.0
+python-dotenv>=0.19.0

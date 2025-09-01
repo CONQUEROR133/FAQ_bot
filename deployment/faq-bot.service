@@ -1,0 +1,34 @@
+[Unit]
+Description=FAQ Bot - Telegram FAQ Bot Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=botuser
+Group=botuser
+WorkingDirectory=/opt/faq-bot
+Environment=PYTHONPATH=/opt/faq-bot/src
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/faq-bot/venv/bin/python /opt/faq-bot/run_bot.py
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=faq-bot
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/faq-bot/data /opt/faq-bot/cache /opt/faq-bot/logs /opt/faq-bot/backups
+
+# Resource limits
+LimitNOFILE=1024
+MemoryMax=1G
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

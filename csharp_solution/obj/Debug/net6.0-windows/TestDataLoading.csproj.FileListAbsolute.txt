@@ -1,0 +1,5 @@
+D:\Games\faq_bot\csharp_solution\obj\Debug\net6.0-windows\TestDataLoading.csproj.AssemblyReference.cache
+D:\Games\faq_bot\csharp_solution\obj\Debug\net6.0-windows\TestDataLoading.GeneratedMSBuildEditorConfig.editorconfig
+D:\Games\faq_bot\csharp_solution\obj\Debug\net6.0-windows\TestDataLoading.AssemblyInfoInputs.cache
+D:\Games\faq_bot\csharp_solution\obj\Debug\net6.0-windows\TestDataLoading.AssemblyInfo.cs
+D:\Games\faq_bot\csharp_solution\obj\Debug\net6.0-windows\TestDataLoading.csproj.CoreCompileInputs.cache

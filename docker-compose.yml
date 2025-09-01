@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  faq-bot:
+    build: .
+    container_name: faq-bot
+    restart: unless-stopped
+    environment:
+      - PYTHONPATH=/app/src
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./cache:/app/cache
+      - ./files:/app/files
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+    networks:
+      - bot-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.path.insert(0, '/app/src'); from config import config; print('Bot healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Add a monitoring service
+  monitoring:
+    image: prom/prometheus:latest
+    container_name: faq-bot-monitoring
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - bot-network
+    profiles:
+      - monitoring
+
+networks:
+  bot-network:
+    driver: bridge
+
+volumes:
+  bot-data:
+  bot-cache:
+  bot-logs:

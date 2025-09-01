@@ -1,0 +1,17 @@
+2025-08-26 22:30:24,103 - INFO - 🚀 Starting comprehensive model upgrade validation...
+2025-08-26 22:30:24,103 - INFO - ================================================================================
+2025-08-26 22:30:24,103 - INFO - 🔍 Testing dependencies...
+2025-08-26 22:30:34,813 - INFO - ✅ PASS - sentence_transformers import: Version: 5.1.0
+2025-08-26 22:30:34,817 - INFO - Loading faiss with AVX2 support.
+2025-08-26 22:30:34,886 - INFO - Successfully loaded faiss with AVX2 support.
+2025-08-26 22:30:34,894 - INFO - ✅ PASS - faiss import: FAISS library available
+2025-08-26 22:30:34,894 - INFO - ✅ PASS - numpy import: Version: 2.0.1
+2025-08-26 22:30:34,895 - INFO - ----------------------------------------
+2025-08-26 22:30:34,896 - INFO - ⚙️ Testing configuration...
+2025-08-26 22:30:34,904 - INFO - ✅ PASS - Model name update: Model: ai-forever/ru-en-RoSBERTa
+2025-08-26 22:30:34,904 - INFO - ✅ PASS - Similarity threshold: Threshold: 0.73
+2025-08-26 22:30:34,904 - INFO - ✅ PASS - Password security: Password moved to environment
+2025-08-26 22:30:34,905 - INFO - ----------------------------------------
+2025-08-26 22:30:34,905 - INFO - 🤖 Testing model loading...
+2025-08-26 22:30:34,907 - INFO - Use pytorch device_name: cpu
+2025-08-26 22:30:34,907 - INFO - Load pretrained SentenceTransformer: ai-forever/ru-en-RoSBERTa

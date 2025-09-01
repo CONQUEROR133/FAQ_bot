@@ -1,0 +1,2 @@
+Sample content for manuals #2
+This is a test file in the manuals category.

@@ -1,0 +1,5 @@
+# FAQ Text List Test
+# Format: query|files|links|additional_text
+Текстовый тест 1|test1.pdf||Дополнительная информация для теста 1
+Текстовый тест 2|test2.pdf;test2.docx|https://example.com|Информация с файлами и ссылкой
+Текстовый тест 3||https://google.com|Только ссылка без файлов

@@ -1,0 +1,71 @@
+[
+  {
+    "query": "Изображение: GalaxyUP Смартфоны.jpg (Требуется установка pytesseract для OCR)",
+    "variations": [
+      "GalaxyUP Смартфоны"
+    ],
+    "response": "По вашему запросу найдена информация:",
+    "resources": [
+      {
+        "type": "file",
+        "title": "Материал: GalaxyUP Смартфоны",
+        "files": [
+          "C:/Users/Saveliy/Downloads/Telegram Desktop/GalaxyUP Смартфоны.jpg"
+        ],
+        "additional_text": "Изображение: GalaxyUP Смартфоны.jpg (Требуется установка pytesseract для OCR)"
+      }
+    ],
+    "metadata": {
+      "source_type": "image",
+      "confidence": 0.3,
+      "processed_at": "2025-08-30T22:23:50.952480",
+      "hash": "b98a2362aa3c"
+    }
+  },
+  {
+    "query": "Изображение: GalaxyUP ТВ.jpg (Требуется установка pytesseract для OCR)",
+    "variations": [
+      "GalaxyUP ТВ"
+    ],
+    "response": "По вашему запросу найдена информация:",
+    "resources": [
+      {
+        "type": "file",
+        "title": "Материал: GalaxyUP ТВ",
+        "files": [
+          "C:/Users/Saveliy/Downloads/Telegram Desktop/GalaxyUP ТВ.jpg"
+        ],
+        "additional_text": "Изображение: GalaxyUP ТВ.jpg (Требуется установка pytesseract для OCR)"
+      }
+    ],
+    "metadata": {
+      "source_type": "image",
+      "confidence": 0.3,
+      "processed_at": "2025-08-30T22:23:50.967877",
+      "hash": "a0eb5a5b68a5"
+    }
+  },
+  {
+    "query": "Изображение: GalaxyUP Часы.jpg (Требуется установка pytesseract для OCR)",
+    "variations": [
+      "GalaxyUP Часы"
+    ],
+    "response": "По вашему запросу найдена информация:",
+    "resources": [
+      {
+        "type": "file",
+        "title": "Материал: GalaxyUP Часы",
+        "files": [
+          "C:/Users/Saveliy/Downloads/Telegram Desktop/GalaxyUP Часы.jpg"
+        ],
+        "additional_text": "Изображение: GalaxyUP Часы.jpg (Требуется установка pytesseract для OCR)"
+      }
+    ],
+    "metadata": {
+      "source_type": "image",
+      "confidence": 0.3,
+      "processed_at": "2025-08-30T22:23:50.977870",
+      "hash": "90bc71f56b2b"
+    }
+  }
+]

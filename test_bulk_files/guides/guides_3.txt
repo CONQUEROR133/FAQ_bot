@@ -1,0 +1,2 @@
+Sample content for guides #3
+This is a test file in the guides category.
