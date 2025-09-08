@@ -1,0 +1,5 @@
+# FAQ Template - format: query|files|links|additional_text
+# Use semicolon (;) to separate multiple files or links
+Пример вопроса|C:\path\to\file.pdf|https://example.com|Дополнительная информация
+Другой вопрос|C:\path\to\file1.pdf;C:\path\to\file2.docx||Только файлы
+Ссылочный вопрос||https://example.com|Только ссылка
