@@ -320,6 +320,102 @@ async def link_selection_callback(callback: CallbackQuery, faq_loader):
         logging.error(f"Ошибка при обработке выбора ссылки: {str(e)}")
         await callback.answer("❌ Произошла ошибка")
 
+@router.callback_query(F.data.startswith("tv_year_"))
+async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_loader):
+    """Обработчик выбора года для сводной таблицы ТВ"""
+    # Проверяем аутентификацию
+    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
+        await callback.answer(
+            "🔒 Сессия истекла. Выполните /start для повторной аутентификации.",
+            show_alert=True
+        )
+        return
+    
+    try:
+        # Парсим год из callback_data
+        year = callback.data.split("_")[-1]
+        
+        if year not in ["2024", "2025"]:
+            await callback.answer("❌ Неверный год")
+            return
+        
+        # Проверяем доступность callback.message
+        if not callback.message:
+            await callback.answer("❌ Сообщение недоступно")
+            return
+        
+        # Ищем соответствующую запись в FAQ
+        if not faq_loader.faq:
+            await callback.answer("❌ Данные не загружены")
+            return
+        
+        # Находим запись по году
+        target_query = f"Сводная таблица ТВ {year}"
+        target_index = None
+        
+        for i, item in enumerate(faq_loader.faq):
+            if item.get("query") == target_query:
+                target_index = i
+                break
+        
+        if target_index is None:
+            await callback.answer("❌ Запись не найдена")
+            return
+        
+        match = faq_loader.faq[target_index]
+        
+        # Отправляем ответ
+        await callback.message.answer(match['response'])
+        
+        # Отправляем файл
+        if 'resources' in match and match['resources']:
+            resource = match['resources'][0]  # Берем первый ресурс
+            if resource.get('type') == 'file':
+                files = resource.get('files', [])
+                if files:
+                    file_path = files[0]  # Берем первый файл
+                    
+                    if os.path.exists(file_path):
+                        # Проверяем размер файла
+                        try:
+                            file_size = os.path.getsize(file_path)
+                            if file_size > 50 * 1024 * 1024:  # 50MB
+                                await callback.answer("❌ Файл слишком большой")
+                                return
+                        except OSError as e:
+                            logging.error(f"Ошибка проверки размера файла: {e}")
+                            await callback.answer("❌ Ошибка доступа к файлу")
+                            return
+                        
+                        # Отправляем файл
+                        try:
+                            async def send_file():
+                                if callback.message:
+                                    return await callback.message.answer_document(types.FSInputFile(file_path))
+                                return None
+                            
+                            await retry_file_operation(send_file)
+                            await callback.answer("✅ Файл отправлен")
+                            logging.info(f"Успешно отправлен файл: {file_path}")
+                        except Exception as send_error:
+                            logging.error(f"Ошибка отправки файла: {send_error}")
+                            await callback.answer("❌ Ошибка отправки файла")
+                            return
+                    else:
+                        await callback.answer("❌ Файл не найден")
+                        return
+        
+        # Удаляем клавиатуру
+        try:
+            if callback.message and hasattr(callback.message, 'edit_reply_markup') and not isinstance(callback.message, types.InaccessibleMessage):
+                await callback.message.edit_reply_markup(reply_markup=None)
+        except Exception as edit_error:
+            logging.warning(f"Не удалось удалить клавиатуру: {edit_error}")
+        
+    except Exception as e:
+        logging.error(f"Ошибка при обработке выбора года ТВ: {str(e)}")
+        await callback.answer("❌ Произошла ошибка")
+
 @router.callback_query(F.data.startswith("resource_"))
 async def resource_selection_callback(callback: CallbackQuery, faq_loader, db, config):
     """Обработчик выбора ресурса"""
@@ -450,6 +546,102 @@ async def resource_selection_callback(callback: CallbackQuery, faq_loader, db, c
             await callback.answer("❌ Произошла ошибка")
         except:
             pass
+
+@router.callback_query(F.data.startswith("tv_year_"))
+async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_loader):
+    """Обработчик выбора года для сводной таблицы ТВ"""
+    # Проверяем аутентификацию
+    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
+        await callback.answer(
+            "🔒 Сессия истекла. Выполните /start для повторной аутентификации.",
+            show_alert=True
+        )
+        return
+    
+    try:
+        # Парсим год из callback_data
+        year = callback.data.split("_")[-1]
+        
+        if year not in ["2024", "2025"]:
+            await callback.answer("❌ Неверный год")
+            return
+        
+        # Проверяем доступность callback.message
+        if not callback.message:
+            await callback.answer("❌ Сообщение недоступно")
+            return
+        
+        # Ищем соответствующую запись в FAQ
+        if not faq_loader.faq:
+            await callback.answer("❌ Данные не загружены")
+            return
+        
+        # Находим запись по году
+        target_query = f"Сводная таблица ТВ {year}"
+        target_index = None
+        
+        for i, item in enumerate(faq_loader.faq):
+            if item.get("query") == target_query:
+                target_index = i
+                break
+        
+        if target_index is None:
+            await callback.answer("❌ Запись не найдена")
+            return
+        
+        match = faq_loader.faq[target_index]
+        
+        # Отправляем ответ
+        await callback.message.answer(match['response'])
+        
+        # Отправляем файл
+        if 'resources' in match and match['resources']:
+            resource = match['resources'][0]  # Берем первый ресурс
+            if resource.get('type') == 'file':
+                files = resource.get('files', [])
+                if files:
+                    file_path = files[0]  # Берем первый файл
+                    
+                    if os.path.exists(file_path):
+                        # Проверяем размер файла
+                        try:
+                            file_size = os.path.getsize(file_path)
+                            if file_size > 50 * 1024 * 1024:  # 50MB
+                                await callback.answer("❌ Файл слишком большой")
+                                return
+                        except OSError as e:
+                            logging.error(f"Ошибка проверки размера файла: {e}")
+                            await callback.answer("❌ Ошибка доступа к файлу")
+                            return
+                        
+                        # Отправляем файл
+                        try:
+                            async def send_file():
+                                if callback.message:
+                                    return await callback.message.answer_document(types.FSInputFile(file_path))
+                                return None
+                            
+                            await retry_file_operation(send_file)
+                            await callback.answer("✅ Файл отправлен")
+                            logging.info(f"Успешно отправлен файл: {file_path}")
+                        except Exception as send_error:
+                            logging.error(f"Ошибка отправки файла: {send_error}")
+                            await callback.answer("❌ Ошибка отправки файла")
+                            return
+                    else:
+                        await callback.answer("❌ Файл не найден")
+                        return
+        
+        # Удаляем клавиатуру
+        try:
+            if callback.message and hasattr(callback.message, 'edit_reply_markup') and not isinstance(callback.message, types.InaccessibleMessage):
+                await callback.message.edit_reply_markup(reply_markup=None)
+        except Exception as edit_error:
+            logging.warning(f"Не удалось удалить клавиатуру: {edit_error}")
+        
+    except Exception as e:
+        logging.error(f"Ошибка при обработке выбора года ТВ: {str(e)}")
+        await callback.answer("❌ Произошла ошибка")
 
 @router.callback_query(F.data == "cancel")
 async def cancel_selection_callback(callback: CallbackQuery, db, config):
@@ -607,6 +799,36 @@ async def auth_users_handler(
     except Exception as e:
         logging.error(f"Ошибка получения списка пользователей: {str(e)}")
         await message.answer("⚠ Произошла ошибка при получении списка пользователей.")
+
+# Обработчик для специального запроса "Сводная ТВ"
+@router.message(F.text.func(lambda text: text and "сводная" in text.lower() and "тв" in text.lower()))
+async def tv_summary_handler(
+    message: Message, 
+    db,
+    config
+):
+    """Обработчик для запросов типа "Сводная ТВ" - показывает кнопки выбора года"""
+    if not message.text or not (text := message.text.strip()):
+        return
+    
+    if not message.from_user:
+        return
+    
+    # Проверяем аутентификацию
+    if not check_authentication(message, db, config):
+        await message.answer(
+            "🔒 Для доступа к боту выполните команду /start и введите пароль."
+        )
+        return
+    
+    # Создаем клавиатуру с выбором года
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📺 ТВ 2024", callback_data="tv_year_2024")],
+        [InlineKeyboardButton(text="📺 ТВ 2025", callback_data="tv_year_2025")],
+        [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")]
+    ])
+    
+    await message.answer("Выберите год сводной таблицы ТВ:", reply_markup=keyboard)
 
 # Этот обработчик должен быть ПОСЛЕДНИМ, так как он ловит все текстовые сообщения
 @router.message(F.text)

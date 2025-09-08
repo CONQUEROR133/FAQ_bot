@@ -83,5 +83,78 @@
       "processed_at": "2025-08-26T21:47:29.000000",
       "hash": "installment_1c"
     }
+  },
+  {
+    "query": "Сводная таблица ТВ 2024",
+    "variations": [
+      "Сводная ТВ 24",
+      "Сводная таблица ТВ 2024",
+      "Таблица ТВ 2024",
+      "ТВ 2024"
+    ],
+    "response": "Вот сводная таблица ТВ 2024:",
+    "resources": [
+      {
+        "title": "Сводная таблица ТВ 2024",
+        "type": "file",
+        "files": ["files/Сводная_ТВ_2024_16.07.24 (1).pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "tv_2024_summary"
+    }
+  },
+  {
+    "query": "Сводная таблица ТВ 2025",
+    "variations": [
+      "Сводная ТВ 25",
+      "Сводная таблица ТВ 2025",
+      "Таблица ТВ 2025",
+      "ТВ 2025"
+    ],
+    "response": "Вот сводная таблица ТВ 2025:",
+    "resources": [
+      {
+        "title": "Сводная таблица ТВ 2025",
+        "type": "file",
+        "files": ["files/190625_СводнаяТВ+AI 2025.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "tv_2025_summary"
+    }
+  },
+  {
+    "query": "Сводная ТВ",
+    "variations": [
+      "Сводная тв",
+      "ТВ",
+      "Телевизоры"
+    ],
+    "response": "Выберите год сводной таблицы ТВ:",
+    "resources": [
+      {
+        "title": "ТВ 2024",
+        "type": "file",
+        "files": ["files/Сводная_ТВ_2024_16.07.24 (1).pdf"]
+      },
+      {
+        "title": "ТВ 2025",
+        "type": "file",
+        "files": ["files/190625_СводнаяТВ+AI 2025.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "tv_summary"
+    }
   }
 ]
