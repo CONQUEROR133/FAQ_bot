@@ -30,6 +30,12 @@
 
 ```bash
 cd faq_bot
+# Создание виртуального окружения (рекомендуется)
+python -m venv venv
+# Активация виртуального окружения
+# Windows:
+venv\Scripts\activate
+# Установка зависимостей
 pip install -e .
 ```
 
@@ -37,6 +43,9 @@ pip install -e .
 
 ```bash
 cd faq_loader
+# Установка зависимостей .NET
+dotnet restore
+# Сборка проекта
 dotnet build
 ```
 
@@ -44,12 +53,22 @@ dotnet build
 
 **Telegram-бот:**
 ```bash
+# Вариант 1: Через bat-файл (Windows)
+cd faq_bot
+1_Start_Bot.bat
+
+# Вариант 2: Через Python
 cd faq_bot
 python run_bot.py
 ```
 
 **Загрузчик FAQ:**
 ```bash
+# Вариант 1: Через bat-файл (Windows)
+cd faq_loader
+start_loader.bat
+
+# Вариант 2: Через .NET CLI
 cd faq_loader
 dotnet run
 ```
