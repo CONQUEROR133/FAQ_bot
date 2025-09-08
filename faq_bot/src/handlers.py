@@ -332,6 +332,11 @@ async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_lo
         return
     
     try:
+        # Проверяем наличие callback.data
+        if not callback.data:
+            await callback.answer("❌ Неверные данные")
+            return
+            
         # Парсим год из callback_data
         year = callback.data.split("_")[-1]
         
@@ -428,6 +433,11 @@ async def soundbar_year_selection_callback(callback: CallbackQuery, db, config, 
         return
     
     try:
+        # Проверяем наличие callback.data
+        if not callback.data:
+            await callback.answer("❌ Неверные данные")
+            return
+            
         # Парсим год из callback_data
         year = callback.data.split("_")[-1]
         
@@ -811,6 +821,78 @@ async def vsk_zayavlenie_callback(callback: CallbackQuery, db, config):
         logging.error(f"Ошибка при обработке выбора заявления ВСК: {str(e)}")
         await callback.answer("❌ Произошла ошибка")
 
+@router.callback_query(F.data == "summary_tv")
+async def summary_tv_callback(callback: CallbackQuery, db, config):
+    """Обработчик выбора сводной таблицы ТВ"""
+    # Проверяем аутентификацию
+    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
+        await callback.answer(
+            "🔒 Сессия истекла. Выполните /start для повторной аутентификации.",
+            show_alert=True
+        )
+        return
+    
+    try:
+        # Проверяем доступность callback.message
+        if not callback.message:
+            await callback.answer("❌ Сообщение недоступно")
+            return
+        
+        # Создаем клавиатуру с выбором года для ТВ
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="📺 ТВ 2024", callback_data="tv_year_2024")],
+            [InlineKeyboardButton(text="📺 ТВ 2025", callback_data="tv_year_2025")],
+            [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")]
+        ])
+        
+        # Проверяем, что сообщение доступно для редактирования
+        if hasattr(callback.message, 'edit_text') and not isinstance(callback.message, types.InaccessibleMessage):
+            await callback.message.edit_text("Выберите год сводной таблицы ТВ:", reply_markup=keyboard)
+        else:
+            # Если не можем редактировать сообщение, отправляем новое
+            await callback.message.answer("Выберите год сводной таблицы ТВ:", reply_markup=keyboard)
+        await callback.answer()
+        
+    except Exception as e:
+        logging.error(f"Ошибка при обработке выбора сводной таблицы ТВ: {str(e)}")
+        await callback.answer("❌ Произошла ошибка")
+
+@router.callback_query(F.data == "summary_soundbar")
+async def summary_soundbar_callback(callback: CallbackQuery, db, config):
+    """Обработчик выбора сводной таблицы саундбара"""
+    # Проверяем аутентификацию
+    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
+        await callback.answer(
+            "🔒 Сессия истекла. Выполните /start для повторной аутентификации.",
+            show_alert=True
+        )
+        return
+    
+    try:
+        # Проверяем доступность callback.message
+        if not callback.message:
+            await callback.answer("❌ Сообщение недоступно")
+            return
+        
+        # Создаем клавиатуру с выбором года для саундбара
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🎵 Саундбар 2024", callback_data="soundbar_year_2024")],
+            [InlineKeyboardButton(text="🎵 Саундбар 2025", callback_data="soundbar_year_2025")],
+            [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")]
+        ])
+        
+        # Проверяем, что сообщение доступно для редактирования
+        if hasattr(callback.message, 'edit_text') and not isinstance(callback.message, types.InaccessibleMessage):
+            await callback.message.edit_text("Выберите год сводной таблицы саундбаров:", reply_markup=keyboard)
+        else:
+            # Если не можем редактировать сообщение, отправляем новое
+            await callback.message.answer("Выберите год сводной таблицы саундбаров:", reply_markup=keyboard)
+        await callback.answer()
+        
+    except Exception as e:
+        logging.error(f"Ошибка при обработке выбора сводной таблицы саундбара: {str(e)}")
+        await callback.answer("❌ Произошла ошибка")
+
 @router.message(CommandStart())
 async def start_handler(message: Message, db, config):
     """Обработчик команды /start с аутентификацией"""
@@ -1033,6 +1115,36 @@ async def vsk_handler(
     ])
     
     await message.answer("Выберите нужный документ по страхованию ВСК:", reply_markup=keyboard)
+
+# Обработчик для специального запроса "Сводная" - показывает кнопки выбора между ТВ и саундбаром
+@router.message(F.text.func(lambda text: text and "сводная" in text.lower() and "тв" not in text.lower() and "саундбар" not in text.lower()))
+async def summary_choice_handler(
+    message: Message, 
+    db,
+    config
+):
+    """Обработчик для запроса "Сводная" - показывает кнопки выбора между ТВ и саундбаром"""
+    if not message.text or not (text := message.text.strip()):
+        return
+    
+    if not message.from_user:
+        return
+    
+    # Проверяем аутентификацию
+    if not check_authentication(message, db, config):
+        await message.answer(
+            "🔒 Для доступа к боту выполните команду /start и введите пароль."
+        )
+        return
+    
+    # Создаем клавиатуру с выбором типа сводной
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📺 Сводная ТВ", callback_data="summary_tv")],
+        [InlineKeyboardButton(text="🎵 Сводная Саундбар", callback_data="summary_soundbar")],
+        [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")]
+    ])
+    
+    await message.answer("Выберите тип сводной таблицы:", reply_markup=keyboard)
 
 # Этот обработчик должен быть ПОСЛЕДНИМ, так как он ловит все текстовые сообщения
 @router.message(F.text)
