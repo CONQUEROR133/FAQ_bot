@@ -156,5 +156,380 @@
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "tv_summary"
     }
+  },
+  {
+    "query": "Сводная саундбар 2024",
+    "variations": [
+      "Сводная саундбар 24",
+      "Сводная саундбар 2024",
+      "Саундбар 2024",
+      "Саундбар 24"
+    ],
+    "response": "Вот сводная таблица саундбаров 2024:",
+    "resources": [
+      {
+        "title": "Сводная таблица саундбаров 2024",
+        "type": "file",
+        "files": ["files/Сводная_SB_2024_08.08.24.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "soundbar_2024_summary"
+    }
+  },
+  {
+    "query": "Сводная саундбар 2025",
+    "variations": [
+      "Сводная саундбар 25",
+      "Сводная саундбар 2025",
+      "Саундбар 2025",
+      "Саундбар 25"
+    ],
+    "response": "Вот сводная таблица саундбаров 2025:",
+    "resources": [
+      {
+        "title": "Сводная таблица саундбаров 2025",
+        "type": "file",
+        "files": ["files/photo_2025-09-08_20-59-17.jpg"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "soundbar_2025_summary"
+    }
+  },
+  {
+    "query": "Сводная саундбар",
+    "variations": [
+      "Сводная саундбар",
+      "Саундбар"
+    ],
+    "response": "Выберите год сводной таблицы саундбаров:",
+    "resources": [
+      {
+        "title": "Саундбар 2024",
+        "type": "file",
+        "files": ["files/Сводная_SB_2024_08.08.24.pdf"]
+      },
+      {
+        "title": "Саундбар 2025",
+        "type": "file",
+        "files": ["files/photo_2025-09-08_20-59-17.jpg"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "soundbar_summary"
+    }
+  },
+  {
+    "query": "ВСК",
+    "variations": [
+      "ВСК",
+      "Страхование ВСК",
+      "Программы страхования ВСК"
+    ],
+    "response": "Выберите нужный документ по страхованию ВСК:",
+    "resources": [
+      {
+        "title": "Памятка по продукту ВСК",
+        "type": "file",
+        "files": ["files/Памятка_по_программам_страхования_в_ВСК_сен_24.pdf"]
+      },
+      {
+        "title": "Заявление о страховом случае ВСК",
+        "type": "file",
+        "files": ["files/Заявление ВСК.docx", "files/Заявление о СС_ВСК.xlsx"],
+        "additional_text": "Какие документы нужны для принятия устройства по страхованию в 1С:\n- Заявление о страховом случае (Шаблоны + инструкция выше)\n- Копия паспорта (Основной разворот + прописка)\n- Копия/оригинал Чека\n- Договор страхования"
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "vsk_insurance"
+    }
+  },
+  {
+    "query": "Ежедневный чек лист магазина",
+    "variations": [
+      "Ежедневный чек лист",
+      "Чек лист магазина",
+      "Ежедневный чек-лист",
+      "Чек-лист магазина",
+      "Ежедневный отчет магазина"
+    ],
+    "response": "Вот ежедневный чек лист магазина:",
+    "resources": [
+      {
+        "title": "Ежедневный чек лист магазина",
+        "type": "file",
+        "files": ["files/Ежедневный чек лист Samsung (2).pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "daily_checklist"
+    }
+  },
+  {
+    "query": "UniSafe",
+    "variations": [
+      "UniSafe",
+      "UniSafe презентация",
+      "Презентация UniSafe",
+      "UniSafe продукт"
+    ],
+    "response": "Доступны следующие материалы по UniSafe:",
+    "resources": [
+      {
+        "title": "Презентация продукта",
+        "type": "file",
+        "files": ["files/UniSafe презентация продукта.pptx"]
+      },
+      {
+        "title": "Подбор ПО UniSafe под карту Galaxy UP",
+        "type": "file",
+        "files": ["files/Подбор ПО UniSafe под карту Galax UP.xlsx"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "unisafe_presentation"
+    }
+  },
+  {
+    "query": "Уценка",
+    "variations": [
+      "Продажа уценки",
+      "Правила уценки",
+      "Уцененные товары",
+      "Уцененный товар"
+    ],
+    "response": "Страхование уценки:\n1. RDU - ничего нельзя, кроме карт без гарантии.\n\n2. Уценка некрупная (без выгораний, механики, состояние как новый или близко к этому, с полной заводской гарантией, не возвратная техника, не из ремонта) - можно продавать все страховые продукты.\n\n3. Уценка после возвратов/ремонтов - только наше страхование.\nДоп. условия:\n▪️С момента первой продажи прошло не больше полугода.\n▫️Физически оно без повреждений/выгораний/залитий.\n▪️Уценка не более 30% от текущей цены.\n\n❗️Если на уценку вы даёте ограниченную гарантию (3 месяца, 14 дней), то продлённую гарантию от страховых вы НЕ можете продать.\n\nУстройства, которые приехали нам как демо/рдю - 3 месяца\n\nУстройства, которые мы взяли продажные, перевели в демо и выставили - обычная гарантия (так как это просто продажный товар). Такие сценарии были с А линейкой",
+    "resources": [],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "discount_policy"
+    }
+  },
+  {
+    "query": "Lampa",
+    "variations": [
+      "Лампа",
+      "Настройка Lampa",
+      "Lampa настройка"
+    ],
+    "response": "Настройка Lampa. Ссылки могут меняться, актуальные всегда в ТГ канале https://t.me/lampa_plugins",
+    "resources": [
+      {
+        "title": "Настройка Lampa",
+        "type": "file",
+        "files": ["files/Настройка Lampa.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "lampa_setup"
+    }
+  },
+  {
+    "query": "MSX",
+    "variations": [
+      "Media Station X",
+      "Vokino",
+      "MSX настройка",
+      "Media Station X настройка",
+      "Vokino настройка"
+    ],
+    "response": "1. Скачать программу Media Sation X на ТВ\n2. Нажать Settings в программе\n3. Далее Start Parameter\n4. Далее Setup\n5. Написать параметр: nnmtv.pw\n6. Скачать VoKino\n\nВАЖНО! Параметр иногда меняется, актуальный параметр смотреть в ТГ https://t.me/MSX_appstore",
+    "resources": [],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "msx_setup"
+    }
+  },
+  {
+    "query": "Локализация Windows",
+    "variations": [
+      "Локализация",
+      "Windows",
+      "Русский язык",
+      "Windows локализация",
+      "Русский язык Windows"
+    ],
+    "response": "Файлы для локализации Windows:",
+    "resources": [
+      {
+        "title": "22-23H22.zip",
+        "type": "file",
+        "files": ["files/22-23H22.zip"]
+      },
+      {
+        "title": "image_2024-02-14_15-22-20.png",
+        "type": "file",
+        "files": ["files/image_2024-02-14_15-22-20.png"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "windows_localization"
+    }
+  },
+  {
+    "query": "Халва",
+    "variations": [
+      "Халва приложение",
+      "Приложение Халва",
+      "Halva",
+      "Halva app"
+    ],
+    "response": "Ссылка для установки приложения клиенту. Все интересующие вопросы можно найти в боте @agenthalva_bot",
+    "resources": [
+      {
+        "title": "Приложение Халва",
+        "type": "link",
+        "link": "https://cdn.halvacard.ru/Apps/halva/GP_Halva.apk"
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "halva_app"
+    }
+  },
+  {
+    "query": "VPN",
+    "variations": [
+      "ВПН",
+      "VPN Samsung",
+      "ВПН Samsung"
+    ],
+    "response": "VPN от Samsung",
+    "resources": [
+      {
+        "title": "Samsung Max VPN",
+        "type": "file",
+        "files": ["files/Samsung_Max_v4.6.10_MustHave.apk"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "vpn_samsung"
+    }
+  },
+  {
+    "query": "Retail mode",
+    "variations": [
+      "Сброс",
+      "Ретеил",
+      "Demo",
+      "LDU",
+      "Retail",
+      "Ретейл мод",
+      "Демо режим"
+    ],
+    "response": "[21.07.2025] Обновлённый список всех вариантов паролей Retail Mode.\n\nПервый пароль для активации или удаления Retail Mode:\nM729Q16K8546\n5444\nRet@il-7398\nReta!l-9102\n\nВторой дополнительный пароль при активации Retail Mode\n- Для модели A34: Ret@ilA34 \n- Для модели A54: Ret@ilA54\n- Для моделей Z Flip5/Fold5: B5q52023!\n- Для серии Tab S9: TabS92023!\n- Для серии S24: Eureka2024!\n- Для Z Flip6/Fold6: Q6B62024!\n- Для серии S25: Para2025!\n- Для Z Flip7/Fold7: Qb72025!\n\nВторой дополнительный пароль для удаления Retail Mode\n- Для Z Flip6: Fl!p62024!\n- Для Z Fold6: F0ld62024!\n- Для S24 FE: S24fe2024!\n- Для серии Tab S10: T@bS102024!\n- Для серии S25: S252o25!\n- Для A06: A06_2o24!\n- Для A16: A16_2o24!\n- Для A26: A26_2o25!\n- Для A36: A36_2o25!\n- Для A56: A56_2o25!\n- Для Z Flip7: Fl!p72025!\n- Для Z Flip7 FE: Fl!p7fe2025!\n- Для Z Fold7: F0ld72025!",
+    "resources": [],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "retail_mode"
+    }
+  },
+  {
+    "query": "Аудит",
+    "variations": [
+      "Ромир",
+      "Проверка",
+      "Аудит Ромир",
+      "Ромир аудит",
+      "Проверка магазина"
+    ],
+    "response": "Подтверждение присутствия представителя Ромир в магазине:",
+    "resources": [
+      {
+        "title": "Подтверждение присутствия представителя Ромир",
+        "type": "file",
+        "files": ["files/Подтверждение_присутствия_представителя_Ромир_в_магазине_.docx"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "audit_romir"
+    }
+  },
+  {
+    "query": "Samsung Health Monitor",
+    "variations": [
+      "Самуснг Хелс",
+      "Хелс",
+      "Health",
+      "Samsung Health",
+      "Health Monitor"
+    ],
+    "response": "Правила работы Samsung Health",
+    "resources": [
+      {
+        "title": "Health Monitor",
+        "type": "file",
+        "files": ["files/Health Monitor (082025)_250807_163719.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "samsung_health"
+    }
+  },
+  {
+    "query": "Дооформление рассрочки",
+    "variations": [
+      "Дооформление кредита",
+      "Рассрочка",
+      "Кредит",
+      "Дооформление",
+      "Всегда Да"
+    ],
+    "response": "❗️Информация по кредитам/рассрочкам❗️\n\n⚡️НАПОМИНАЮ: вот инструкция по ДООФОРМЛЕНИЮ кредитов и рассрочек ВСЕГДА ДА, если клиент оформлял онлайн и пришел на ДООФОРМЛЕНИЕ в магазин!\n\n❗️ВСЕГДА необходимо проверять статус кредита в заказе покупателя. ❗️\n\nМОЖНО ВЫДАВАТЬ ТОВАР, если статус кредита во вкладке КРЕДИТ в заказе покупателя:\n\n☑️ПОДПИСАН\n☑️ДОГОВОР СТАЛ ДЕЙСТВУЮЩИМ.\n\nДооформить заявку клиента, которую клиент отправил on-line НЕОБХОДИМО ТАК:\n\n❗️Заходим в ПО Всегда Да\n❗️Выбираем дату заведения заявки\n❗️Находим клиента по ФИО или по номеру заявки (она у клиента в СМС) \n❗️Дооформляем кредит / рассрочку",
+    "resources": [
+      {
+        "title": "Инструкция по дооформлению",
+        "type": "file",
+        "files": ["files/c_Instruktsiya_po_dooformleniy_pos_online.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-08T10:00:00.000000",
+      "hash": "installment_completion"
+    }
   }
 ]
