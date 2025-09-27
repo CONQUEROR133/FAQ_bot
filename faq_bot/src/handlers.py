@@ -1146,6 +1146,105 @@ async def summary_choice_handler(
     
     await message.answer("Выберите тип сводной таблицы:", reply_markup=keyboard)
 
+# Обработчик для специального запроса "Чек-Лист", "Чек лист", "Проверка"
+@router.message(F.text.func(lambda text: text and any(keyword in text.lower() for keyword in ["чек-лист", "чек лист", "проверка"])))
+async def checklist_handler(
+    message: Message, 
+    db,
+    config,
+    faq_loader
+):
+    """Обработчик для запросов типа "Чек-Лист", "Чек лист", "Проверка" - показывает кнопки выбора"""
+    if not message.text or not (text := message.text.strip()):
+        return
+    
+    if not message.from_user:
+        return
+    
+    # Проверяем аутентификацию
+    if not check_authentication(message, db, config):
+        await message.answer(
+            "🔒 Для доступа к боту выполните команду /start и введите пароль."
+        )
+        return
+    
+    # Ищем запись "Чек-Лист" в FAQ
+    if not faq_loader.faq:
+        await message.answer("❌ Данные не загружены")
+        return
+    
+    target_query = "Чек-Лист"
+    target_index = None
+    
+    for i, item in enumerate(faq_loader.faq):
+        if item.get("query") == target_query:
+            target_index = i
+            break
+    
+    if target_index is None:
+        await message.answer("❌ Запись не найдена")
+        return
+    
+    match = faq_loader.faq[target_index]
+    
+    # Отправляем ответ
+    await message.answer(match['response'])
+    
+    # Показываем клавиатуру для выбора ресурсов
+    keyboard = create_resource_selection_keyboard(match, target_index)
+    await message.answer("👆 Выберите нужный ресурс:", reply_markup=keyboard)
+
+# Обработчик для специального запроса "Сканер", "Подключение сканеров", "Netum"
+@router.message(F.text.func(lambda text: text and any(keyword in text.lower() for keyword in ["сканер", "подключение сканеров", "netum"])))
+async def scanner_handler(
+    message: Message, 
+    db,
+    config,
+    faq_loader
+):
+    """Обработчик для запросов типа "Сканер", "Подключение сканеров", "Netum" - автоматически отправляет файлы"""
+    if not message.text or not (text := message.text.strip()):
+        return
+    
+    if not message.from_user:
+        return
+    
+    # Проверяем аутентификацию
+    if not check_authentication(message, db, config):
+        await message.answer(
+            "🔒 Для доступа к боту выполните команду /start и введите пароль."
+        )
+        return
+    
+    # Ищем запись "Сканер" в FAQ
+    if not faq_loader.faq:
+        await message.answer("❌ Данные не загружены")
+        return
+    
+    target_query = "Сканер"
+    target_index = None
+    
+    for i, item in enumerate(faq_loader.faq):
+        if item.get("query") == target_query:
+            target_index = i
+            break
+    
+    if target_index is None:
+        await message.answer("❌ Запись не найдена")
+        return
+    
+    match = faq_loader.faq[target_index]
+    
+    # Отправляем ответ
+    await message.answer(match['response'])
+    
+    # Автоматически отправляем ресурсы
+    if 'resources' in match and match['resources']:
+        resource = match['resources'][0]  # Берем первый ресурс
+        success = await auto_send_single_resource(message, resource)
+        if not success:
+            await message.answer("❌ Не удалось отправить файлы. Обратитесь к администратору.")
+
 # Этот обработчик должен быть ПОСЛЕДНИМ, так как он ловит все текстовые сообщения
 @router.message(F.text)
 async def message_handler(

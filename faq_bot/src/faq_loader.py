@@ -292,7 +292,8 @@ class FAQLoader:
                 self.faq_queries = valid_queries
             
             # Create embeddings with progress logging
-            batch_size = min(32, len(valid_queries))  # Optimize batch size
+            # Use optimized batch size from config for i5-4570
+            batch_size = min(config.ml.batch_size, len(valid_queries))  # Optimize batch size
             
             logger.info(f"Encoding {len(valid_queries)} queries with batch size {batch_size}")
             
@@ -326,8 +327,8 @@ class FAQLoader:
             # Add embeddings to index with proper error handling
             try:
                 # Add embeddings to FAISS index
-                # FAISS add() method: add(x)
-                self.index.add(faq_embeddings)
+                # FAISS add method: add(x)
+                self.index.add(faq_embeddings.astype(np.float32))
             except Exception as e:
                 logger.error(f"Failed to add embeddings to FAISS index: {e}")
                 raise FAQLoaderError(f"FAISS index creation failed: {e}") from e

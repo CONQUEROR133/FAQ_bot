@@ -8,11 +8,16 @@ from dataclasses import dataclass
 
 # Handle aiogram import with fallback
 try:
-    from aiogram import types
+    from aiogram.types import User
 except ImportError:
-    # Create a minimal types module for development environments
-    class types:
-        pass
+    # Create a minimal User class for development environments
+    class User:
+        def __init__(self, id: int, username: Optional[str] = None, 
+                     first_name: Optional[str] = None, last_name: Optional[str] = None):
+            self.id = id
+            self.username = username
+            self.first_name = first_name
+            self.last_name = last_name
 
 from config import config
 
@@ -57,7 +62,7 @@ class Database:
         self.db_path = Path(db_path) if db_path else Path(config.DB_PATH)
         self._ensure_db_directory()
         
-        # Connection settings
+        # Connection settings optimized for i5-4570 and 16GB RAM
         self.timeout = 30.0
         self.check_same_thread = False
         
@@ -224,7 +229,7 @@ class Database:
             logger.error(f"Failed to log query: {e}")
             return False
     
-    def log_bad_word(self, user: types.User, message: str, severity: str = "medium") -> bool:
+    def log_bad_word(self, user: User, message: str, severity: str = "medium") -> bool:
         """Log bad word usage with severity classification.
         
         Args:
@@ -417,7 +422,7 @@ class Database:
             logger.error(f"Failed to check authentication for user {user_id}: {e}")
             return False
     
-    def authenticate_user(self, user: types.User) -> bool:
+    def authenticate_user(self, user: User) -> bool:
         """Authenticate a user with improved error handling.
         
         Args:

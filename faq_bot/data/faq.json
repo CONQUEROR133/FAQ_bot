@@ -258,30 +258,6 @@
     }
   },
   {
-    "query": "Ежедневный чек лист магазина",
-    "variations": [
-      "Ежедневный чек лист",
-      "Чек лист магазина",
-      "Ежедневный чек-лист",
-      "Чек-лист магазина",
-      "Ежедневный отчет магазина"
-    ],
-    "response": "Вот ежедневный чек лист магазина:",
-    "resources": [
-      {
-        "title": "Ежедневный чек лист магазина",
-        "type": "file",
-        "files": ["files/Ежедневный чек лист Samsung (2).pdf"]
-      }
-    ],
-    "metadata": {
-      "source_type": "manual",
-      "confidence": 0.95,
-      "processed_at": "2025-09-08T10:00:00.000000",
-      "hash": "daily_checklist"
-    }
-  },
-  {
     "query": "UniSafe",
     "variations": [
       "UniSafe",
@@ -512,10 +488,7 @@
     "query": "Дооформление рассрочки",
     "variations": [
       "Дооформление кредита",
-      "Рассрочка",
-      "Кредит",
-      "Дооформление",
-      "Всегда Да"
+      "Дооформление"
     ],
     "response": "❗️Информация по кредитам/рассрочкам❗️\n\n⚡️НАПОМИНАЮ: вот инструкция по ДООФОРМЛЕНИЮ кредитов и рассрочек ВСЕГДА ДА, если клиент оформлял онлайн и пришел на ДООФОРМЛЕНИЕ в магазин!\n\n❗️ВСЕГДА необходимо проверять статус кредита в заказе покупателя. ❗️\n\nМОЖНО ВЫДАВАТЬ ТОВАР, если статус кредита во вкладке КРЕДИТ в заказе покупателя:\n\n☑️ПОДПИСАН\n☑️ДОГОВОР СТАЛ ДЕЙСТВУЮЩИМ.\n\nДооформить заявку клиента, которую клиент отправил on-line НЕОБХОДИМО ТАК:\n\n❗️Заходим в ПО Всегда Да\n❗️Выбираем дату заведения заявки\n❗️Находим клиента по ФИО или по номеру заявки (она у клиента в СМС) \n❗️Дооформляем кредит / рассрочку",
     "resources": [
@@ -530,6 +503,306 @@
       "confidence": 0.95,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "installment_completion"
+    }
+  },
+  {
+    "query": "Сканер",
+    "variations": [
+      "Сканер",
+      "Подключение сканеров",
+      "Netum"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "Сброс на заводские настройки-SN-Netum-C750",
+        "type": "file",
+        "files": [
+          "files/Сброс на заводские настройки-SN-Netum-C750 (1).pdf",
+          "files/Подключение по Dongle-Netum-C750.pdf"
+        ]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-27T23:00:00.000000",
+      "hash": "scanner_netum"
+    }
+  },
+  {
+    "query": "Чек-Лист",
+    "variations": [
+      "Чек-Лист",
+      "Чек лист",
+      "Проверка"
+    ],
+    "response": "Выберите нужный чек-лист:",
+    "resources": [
+      {
+        "title": "Ежедневный Чек-Лист магазина",
+        "type": "file",
+        "files": ["files/Ежедневный чек лист Samsung (2).pdf"]
+      },
+      {
+        "title": "Чек-Лист РОПа",
+        "type": "file",
+        "files": ["files/Operational Checklist .pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-27T23:00:00.000000",
+      "hash": "checklist"
+    }
+  },
+  {
+    "query": "platinum",
+    "variations": [
+      "platinum",
+      "Security",
+      "Платинум",
+      "Секьюрити",
+      "Секурити",
+      "Секюрити"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "Platinum Security",
+        "type": "file",
+        "files": ["files/Platinum _ Security.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-27T23:00:00.000000",
+      "hash": "platinum_security"
+    }
+  },
+  {
+    "query": "ТреидИн",
+    "variations": [
+      "ТреидИн",
+      "Traide-in",
+      "Tradein",
+      "Traidein",
+      "Инструкция по приему 1С"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "Trade In",
+        "type": "file",
+        "files": ["files/TRADE IN.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-27T23:00:00.000000",
+      "hash": "trade_in"
+    }
+  },
+  {
+    "query": "Категории",
+    "variations": [
+      "Категории",
+      "Категория",
+      "Баллы"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "Новые Категории",
+        "type": "file",
+        "files": ["files/Новые Категории 0.3.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-27T23:00:00.000000",
+      "hash": "categories"
+    }
+  },
+  {
+    "query": "Счет",
+    "variations": [
+      "Счет",
+      "Безнал",
+      "УПД",
+      "ЮрЛица"
+    ],
+    "response": "Выберите нужную инструкцию:",
+    "resources": [
+      {
+        "title": "Инструкция по выставлению счёта",
+        "type": "file",
+        "files": ["files/Инструкция_по_выставлению_счёта_для_безналичной_оплаты_юридическим.doc"]
+      },
+      {
+        "title": "Инструкция по выдаче и УПД",
+        "type": "file",
+        "files": ["files/Регламент_выдачи_товара_клиенту_юридическому_лицу_и_подписание_УПД.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-27T23:00:00.000000",
+      "hash": "invoice_documents"
+    }
+  },
+  {
+    "query": "Бельмонт",
+    "variations": [
+      "Бельмонт",
+      "Belmont"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "Реализация Belmont",
+        "type": "file",
+        "files": ["files/photo_2025-09-28_00-24-00.jpg"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-28T00:00:00.000000",
+      "hash": "belmont"
+    }
+  },
+  {
+    "query": "Реализация СдалКупил",
+    "variations": [
+      "Реализиция СдалКупил",
+      "Реализация Сдал Купил",
+      "Реализация Сдал-Купил"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "Реализация СдалКупил",
+        "type": "file",
+        "files": ["files/СдалКупил реализация-Смарт.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-28T00:00:00.000000",
+      "hash": "realization_sdal_kupil"
+    }
+  },
+  {
+    "query": "Реализация",
+    "variations": [
+      "Реализация"
+    ],
+    "response": "Выберите тип реализации:",
+    "resources": [
+      {
+        "title": "Реализация Belmont",
+        "type": "file",
+        "files": ["files/photo_2025-09-28_00-24-00.jpg"]
+      },
+      {
+        "title": "Реализация СдалКупил",
+        "type": "file",
+        "files": ["files/СдалКупил реализация-Смарт.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-28T00:00:00.000000",
+      "hash": "realization"
+    }
+  },
+  {
+    "query": "Анкета Тайного Покпателя",
+    "variations": [
+      "Анкета Тайного Покпателя",
+      "Анкета",
+      "Тайник",
+      "ТП",
+      "Тайный",
+      "Анкета ТП"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "Анкета Тайного Покупателя",
+        "type": "file",
+        "files": ["files/Анкета_тайного_покупателя_Vol_2_2_3.docx"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-28T00:00:00.000000",
+      "hash": "secret_shopper_questionnaire"
+    }
+  },
+  {
+    "query": "Черная печать",
+    "variations": [
+      "Черная печать",
+      "Печать"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "Справка о черной печати",
+        "type": "file",
+        "files": ["files/справка о черной печати.pdf"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-28T00:00:00.000000",
+      "hash": "black_seal"
+    }
+  },
+  {
+    "query": "КТУ",
+    "variations": [
+      "КТУ"
+    ],
+    "response": "По вашему запросу есть следующее:",
+    "resources": [
+      {
+        "title": "КТУ",
+        "type": "file",
+        "files": ["files/image_2024-12-24_11-47-34.png"]
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-28T00:00:00.000000",
+      "hash": "ktu"
+    }
+  },
+  {
+    "query": "Бейдж",
+    "variations": [
+      "Бейдж",
+      "Бейджик"
+    ],
+    "response": "Ссылка только для печати ценников/бейдж которых нет в MCS:\n1. https://24.nbcom.ru/rmp/samsung.php\n2. https://rmp.nbcom.ru/price\n3. https://rmp.nbcom.ru/badge",
+    "resources": [],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-09-28T00:00:00.000000",
+      "hash": "badge"
     }
   }
 ]

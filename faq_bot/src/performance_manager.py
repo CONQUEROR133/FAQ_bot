@@ -211,9 +211,11 @@ class PerformanceManager:
     
     def __init__(self):
         """Initialize performance manager."""
+        from config import config
         self.metrics = PerformanceMetrics()
-        self.query_cache = LRUCache(max_size=500, ttl_seconds=1800)  # 30 minutes
-        self.embedding_cache = LRUCache(max_size=1000, ttl_seconds=3600)  # 1 hour
+        # Use optimized cache sizes from config
+        self.query_cache = LRUCache(max_size=config.ml.cache_size, ttl_seconds=1800)  # 30 minutes
+        self.embedding_cache = LRUCache(max_size=config.ml.embedding_cache_size, ttl_seconds=3600)  # 1 hour
         self.connection_pool = AsyncConnectionPool(max_connections=20)
         
         # Performance monitoring

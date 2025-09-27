@@ -1,68 +1,71 @@
-# FAQ Bot
+# 🤖 FAQ Bot
 
-A Telegram bot for answering frequently asked questions with AI-powered search capabilities.
+Telegram FAQ bot with semantic search capabilities using Sentence-BERT and FAISS.
 
-## Prerequisites
+## 🚀 Quick Start
 
-- Python 3.8 or higher
-- pip (Python package installer)
+### For Command Prompt (cmd)
+```cmd
+# Initial setup (run once)
+0_Setup.bat
 
-## Installation
+# Start the bot
+1_Start_Bot.bat
 
-1. Clone or download the repository
-2. Navigate to the project directory:
-   ```bash
-   cd faq_bot
-   ```
-
-3. Create a virtual environment (recommended):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-4. Install the required dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Configuration
-
-1. Create a `.env` file in the project root directory
-2. Add the following environment variables to the `.env` file:
-   ```
-   BOT_TOKEN=your_telegram_bot_token
-   ADMIN_ID=your_telegram_user_id
-   DB_PATH=data/analytics.db
-   FAQ_FILE=data/faq.json
-   EMBEDDINGS_FILE=cache/embeddings.pkl
-   INDEX_FILE=cache/faiss_index.bin
-   ```
-
-## Running the Bot
-
-```bash
-python src/main.py
+# Stop the bot
+2_Stop_bot.bat
 ```
 
-## Project Structure
+### For PowerShell
+```powershell
+# Initial setup (run once)
+.\0_Setup.bat
+
+# Start the bot
+.\start.ps1
+
+# Stop the bot
+.\2_Stop_bot.bat
+```
+
+## 📁 Project Structure
 
 - `src/` - Source code
-  - `main.py` - Entry point
-  - `config.py` - Configuration management
-  - `database.py` - Database operations
-  - `faq_loader.py` - FAQ data loading and search
-  - `handlers.py` - Telegram message handlers
-  - `auth_middleware.py` - Authentication middleware
-  - `security_middleware.py` - Security middleware
-  - `performance_manager.py` - Performance tracking
-- `data/` - Data files (faq.json, analytics.db)
-- `cache/` - Cache files (embeddings, FAISS index)
-- `templates/` - Response templates
+- `data/` - FAQ data and database
+- `cache/` - Model embeddings and cache files
+- `files/` - Media files
+- `venv/` - Python virtual environment
 
-## Dependencies
+## ⚙️ Configuration
 
-- aiogram - Telegram Bot API framework
-- faiss-cpu - Similarity search library
-- numpy - Numerical computing
-- sentence-transformers - Sentence embeddings
+1. Create a bot with [@BotFather](https://t.me/BotFather) on Telegram
+2. Copy your bot token to `.env` file:
+   ```
+   BOT_TOKEN=your_bot_token_here
+   ADMIN_ID=your_telegram_id
+   ACCESS_PASSWORD=your_password
+   ```
+
+## 🧠 Training the Model
+
+Run `4_Train_Model.bat` to retrain the semantic search model with your FAQ data.
+
+## 🛠 Scripts
+
+- `0_Setup.bat` - Initial setup
+- `1_Start_Bot.bat` - Start bot (for cmd)
+- `start.ps1` - Start bot (for PowerShell)
+- `2_Stop_bot.bat` - Stop bot
+- `3_Clean_All.bat` - Clean cache and logs
+- `4_Train_Model.bat` - Train semantic search model
+- `5_Check_Status.bat` - Check system status
+
+## 📋 Requirements
+
+- Python 3.8+
+- Windows OS
+- Telegram bot token
+
+## 📞 Support
+
+For issues, check the logs in `cache/bot.log` or run `5_Check_Status.bat`.

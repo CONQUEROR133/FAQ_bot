@@ -223,12 +223,21 @@ class SecurityConfig:
 class MLConfig:
     """Machine Learning model configuration."""
     model_name: str = "ai-forever/ru-en-RoSBERTa"
-    similarity_threshold: float = 0.73
+    similarity_threshold: float = 0.7
+    batch_size: int = 16  # Optimized for i5-4570
+    cache_size: int = 500  # Optimized for 16GB RAM
+    embedding_cache_size: int = 1000  # Optimized for 16GB RAM
     
     def __post_init__(self):
         """Validate ML configuration values."""
         if not (0.0 <= self.similarity_threshold <= 1.0):
             raise ValueError("Similarity threshold must be between 0.0 and 1.0")
+        if self.batch_size <= 0:
+            raise ValueError("Batch size must be positive")
+        if self.cache_size <= 0:
+            raise ValueError("Cache size must be positive")
+        if self.embedding_cache_size <= 0:
+            raise ValueError("Embedding cache size must be positive")
 
 
 class Config:
@@ -267,7 +276,10 @@ class Config:
         
         self.ml = MLConfig(
             model_name=os.getenv("MODEL_NAME", "ai-forever/ru-en-RoSBERTa"),
-            similarity_threshold=self._get_float_env("SIMILARITY_THRESHOLD", 0.73)
+            similarity_threshold=self._get_float_env("SIMILARITY_THRESHOLD", 0.73),
+            batch_size=self._get_int_env("BATCH_SIZE", 16),
+            cache_size=self._get_int_env("CACHE_SIZE", 500),
+            embedding_cache_size=self._get_int_env("EMBEDDING_CACHE_SIZE", 1000)
         )
         
         # Backward compatibility properties
@@ -370,6 +382,9 @@ class Config:
             f"  - Base Directory: {self.BASE_DIR}\n"
             f"  - ML Model: {self.ml.model_name}\n"
             f"  - Similarity Threshold: {self.ml.similarity_threshold}\n"
+            f"  - Batch Size: {self.ml.batch_size}\n"
+            f"  - Cache Size: {self.ml.cache_size}\n"
+            f"  - Embedding Cache Size: {self.ml.embedding_cache_size}\n"
             f"  - Network Timeout: {self.network.request_timeout}s\n"
             f"  - Max Retries: {self.network.max_retries}"
         )
