@@ -6,7 +6,7 @@
 echo "🧠 Training model on VPS with limited resources..."
 
 # Activate virtual environment
-source venv/bin/activate
+source ../venv/bin/activate
 
 # Set environment variables optimized for VPS
 export BATCH_SIZE=8
@@ -15,6 +15,8 @@ export EMBEDDING_CACHE_SIZE=200
 
 # Run model training with resource constraints
 echo "🚀 Starting model training with optimized settings..."
+cd ..
 python train_model.py
+cd Linux_Start
 
 echo "✅ Model training completed!"

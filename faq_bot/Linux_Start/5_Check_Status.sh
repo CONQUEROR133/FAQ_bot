@@ -4,6 +4,9 @@
 
 echo "🔍 Checking FAQ Bot status..."
 
+# Change to the parent directory to check files correctly
+cd ..
+
 # Check if bot is running
 if pgrep -f "python.*run_bot.py" > /dev/null; then
     echo "✅ Bot is running"
@@ -51,3 +54,6 @@ if [ -f "cache/faq_embeddings.pkl" ] && [ -f "cache/faq_index.faiss" ]; then
 else
     echo "   ⚠️  Model files: missing or incomplete"
 fi
+
+# Change back to Linux_Start directory
+cd Linux_Start

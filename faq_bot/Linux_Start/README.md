@@ -53,3 +53,25 @@ This directory contains scripts to run the FAQ Bot on Ubuntu VPS with the follow
 ## Note for Windows Users
 
 If you're preparing these scripts on Windows, make sure to convert line endings to Unix format (LF) before uploading to your Linux VPS. You can use the [convert_to_unix.sh](file://d:\Games\faq_bot\Linux_Start\convert_to_unix.sh) script or tools like `dos2unix` or text editors like VS Code or Notepad++ to convert line endings.
+
+## Directory Structure
+
+The scripts are designed to work with the following directory structure:
+```
+faq_bot/
+├── Linux_Start/
+│   ├── 0_Setup.sh
+│   ├── 1_Train_Model.sh
+│   ├── 2_Start_Bot.sh
+│   ├── 3_Stop_Bot.sh
+│   ├── 4_Clean_All.sh
+│   ├── 5_Check_Status.sh
+│   └── ...
+├── venv/
+├── data/
+├── cache/
+├── src/
+└── ...
+```
+
+All scripts should be run from within the Linux_Start directory.

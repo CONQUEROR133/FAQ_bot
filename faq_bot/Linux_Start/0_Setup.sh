@@ -28,9 +28,12 @@ source venv/bin/activate
 echo "⬆️  Upgrading pip..."
 pip install --upgrade pip
 
-# Install project dependencies
+# Install project dependencies from the correct directory
 echo "📥 Installing project dependencies..."
+# Change to the parent directory (faq_bot) to install dependencies
+cd ..
 pip install -e .
+cd Linux_Start
 
 echo "✅ Setup completed successfully!"
-echo "To activate the environment, run: source venv/bin/activate"
+echo "To activate the environment, run: source ../venv/bin/activate"

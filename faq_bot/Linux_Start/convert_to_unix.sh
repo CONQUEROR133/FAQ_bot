@@ -5,7 +5,7 @@
 
 echo "Converting line endings to Unix format..."
 
-# Convert all .sh files
+# Convert all .sh files in the current directory
 for file in *.sh; do
     if [ -f "$file" ]; then
         echo "Converting $file..."

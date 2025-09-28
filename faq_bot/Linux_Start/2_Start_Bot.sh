@@ -6,13 +6,15 @@
 echo "🚀 Starting FAQ Bot..."
 
 # Activate virtual environment
-source venv/bin/activate
+source ../venv/bin/activate
 
 # Set environment variables optimized for VPS
 export BATCH_SIZE=8
 export CACHE_SIZE=100
 export EMBEDDING_CACHE_SIZE=200
 
-# Start the bot
+# Start the bot from the correct directory
 echo "🤖 Bot is starting..."
+cd ..
 python run_bot.py
+cd Linux_Start
