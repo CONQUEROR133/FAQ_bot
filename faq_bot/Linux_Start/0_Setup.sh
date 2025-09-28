@@ -19,6 +19,7 @@ sudo apt install -y build-essential libffi-dev
 
 # Create virtual environment
 echo "🔧 Creating virtual environment..."
+cd ..
 python3 -m venv venv
 
 # Activate virtual environment
@@ -30,8 +31,6 @@ pip install --upgrade pip
 
 # Install project dependencies from the correct directory
 echo "📥 Installing project dependencies..."
-# Change to the parent directory (faq_bot) to install dependencies
-cd ..
 pip install -e .
 cd Linux_Start
 

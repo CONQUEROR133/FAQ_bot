@@ -28,7 +28,7 @@ This directory contains scripts to run the FAQ Bot on Ubuntu VPS with the follow
    chmod +x *.sh
    ```
 
-2. Run setup:
+2. Run setup (required before first use):
    ```bash
    ./0_Setup.sh
    ```
@@ -74,4 +74,4 @@ faq_bot/
 └── ...
 ```
 
-All scripts should be run from within the Linux_Start directory.
+All scripts should be run from within the Linux_Start directory. The virtual environment must be created by running [0_Setup.sh](file://d:\Games\faq_bot\Linux_Start\0_Setup.sh) before running other scripts.
