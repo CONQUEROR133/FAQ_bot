@@ -900,6 +900,20 @@ async def start_handler(message: Message, db, config):
         return
         
     user_id = message.from_user.id
+    chat_id = message.chat.id if message.chat else None
+    message_id = message.message_id
+    
+    # Custom logging with required fields
+    import logging
+    logging.getLogger().info(
+        "Start command received",
+        extra={
+            'user_id': user_id,
+            'chat_id': chat_id,
+            'message_id': message_id,
+            'handler': 'start_handler'
+        }
+    )
     
     # Проверяем аутентификацию
     if check_authentication(message, db, config):
@@ -918,6 +932,26 @@ async def start_handler(message: Message, db, config):
 @router.message(Command("help"))
 async def help_handler(message: Message, db, config):
     """Обработчик команды /help с проверкой аутентификации"""
+    if not message.from_user:
+        return
+    
+    user_id = message.from_user.id
+    chat_id = message.chat.id if message.chat else None
+    message_id = message.message_id
+    
+    # Custom logging with required fields
+    import logging
+    logging.getLogger().info(
+        "Help command received",
+        extra={
+            'user_id': user_id,
+            'chat_id': chat_id,
+            'message_id': message_id,
+            'handler': 'help_handler'
+        }
+    )
+    
+    # Проверяем аутентификацию
     if not check_authentication(message, db, config):
         await message.answer(
             "🔒 Для доступа к боту выполните команду /start и введите пароль."
@@ -1261,6 +1295,20 @@ async def message_handler(
         return
         
     user_id = message.from_user.id
+    chat_id = message.chat.id if message.chat else None
+    message_id = message.message_id
+    
+    # Custom logging with required fields
+    import logging
+    logging.getLogger().info(
+        f"User message received: {text[:50]}...",
+        extra={
+            'user_id': user_id,
+            'chat_id': chat_id,
+            'message_id': message_id,
+            'handler': 'message_handler'
+        }
+    )
     
     # Проверяем, ожидает ли пользователь ввода пароля
     if user_id in waiting_for_password:

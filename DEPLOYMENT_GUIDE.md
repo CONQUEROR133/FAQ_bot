@@ -2,10 +2,7 @@
 
 ## Project Overview
 
-This repository contains two independent applications for managing a FAQ (Frequently Asked Questions) system:
-
-1. **faq_bot** - A Python-based Telegram bot for providing FAQ responses
-2. **faq_loader** - A C# application for loading and processing FAQ data
+This repository contains a Python-based Telegram bot for managing a FAQ (Frequently Asked Questions) system.
 
 ## Repository Structure
 
@@ -17,24 +14,17 @@ This repository contains two independent applications for managing a FAQ (Freque
 ├── LICENSE                 # MIT License
 ├── README.md               # Russian README
 ├── README_EN.md            # English README for GitHub
-├── faq_bot/                # Python Telegram bot application
-│   ├── data/               # FAQ data and database files
-│   ├── files/              # Supporting files (images, documents)
-│   ├── src/                # Source code
-│   ├── templates/          # Data templates
-│   ├── tests/              # Test suite
-│   ├── utils/              # Utility scripts
-│   ├── .env.example        # Example configuration file
-│   ├── pyproject.toml      # Python project configuration
-│   ├── requirements.txt    # Python dependencies
-│   └── ...                 # Various scripts and documentation
-└── faq_loader/             # C# FAQ loader application
-    ├── Business/           # Business logic
-    ├── Data/               # Data access layer
-    ├── Presentation/       # UI components
+└── faq_bot/                # Python Telegram bot application
+    ├── data/               # FAQ data and database files
+    ├── files/              # Supporting files (images, documents)
+    ├── src/                # Source code
+    ├── templates/          # Data templates
+    ├── tests/              # Test suite
+    ├── utils/              # Utility scripts
     ├── .env.example        # Example configuration file
-    ├── UniversalFAQLoader.csproj  # C# project file
-    └── ...                 # Other C# project files
+    ├── pyproject.toml      # Python project configuration
+    ├── requirements.txt    # Python dependencies
+    └── ...                 # Various scripts and documentation
 ```
 
 ## Setting up GitHub Repository
@@ -60,7 +50,7 @@ git push -u origin main
 
 Replace `YOUR_USERNAME` with your GitHub username and `YOUR_REPOSITORY_NAME` with your repository name.
 
-## Deploying the Applications
+## Deploying the Application
 
 ### faq_bot (Python Telegram Bot)
 
@@ -103,46 +93,6 @@ Option 2 - Using batch script:
 start_bot.bat
 ```
 
-### faq_loader (C# Application)
-
-#### Prerequisites
-- .NET 6.0 SDK
-- Visual Studio 2022 or newer (for development)
-- Or Visual Studio Code with C# extensions
-
-#### Building
-1. Navigate to the faq_loader directory:
-   ```bash
-   cd faq_loader
-   ```
-
-2. Build the project:
-   ```bash
-   dotnet build
-   ```
-
-#### Running
-Option 1 - Direct execution:
-```bash
-dotnet run
-```
-
-Option 2 - Using batch script:
-```bash
-start_loader.bat
-```
-
-## Integration Between Applications
-
-The two applications work together through shared data files:
-
-1. **faq_loader** generates `faq.json` - the primary FAQ data file
-2. **faq_loader** can create/update `analytics.db` - the analytics database
-3. **faq_bot** consumes `faq.json` for answering user queries
-4. **faq_bot** uses `analytics.db` for tracking usage statistics
-
-Ensure both applications have access to the same data directory for proper integration.
-
 ## Testing
 
 ### faq_bot Tests
@@ -168,15 +118,8 @@ cd faq_bot
 pip install --upgrade -e .
 ```
 
-#### faq_loader
-Update C# dependencies:
-```bash
-cd faq_loader
-dotnet restore
-```
-
 ### Regular Tasks
-1. Update FAQ data using faq_loader when FAQ content changes
+1. Update FAQ data in faq.json when content changes
 2. Monitor bot performance and analytics
 3. Update dependencies and security patches
 4. Backup critical data files
@@ -190,12 +133,6 @@ dotnet restore
 - **Authentication failed**: Verify ADMIN_ID and ACCESS_PASSWORD
 - **Database errors**: Ensure data directory has write permissions
 
-#### faq_loader
-- **Build failures**: Ensure .NET 6.0 SDK is installed
-- **File access errors**: Check file permissions
-- **Data processing issues**: Validate input data format
-
 ### Getting Help
 - Check the documentation in each application's README.md
 - Review the ARCHITECTURE.md file for detailed component information
-- Open an issue on GitHub for bugs or feature requests

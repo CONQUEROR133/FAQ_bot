@@ -2,10 +2,7 @@
 
 ## Overview
 
-This project consists of two independent applications that work together to provide a comprehensive FAQ management system:
-
-1. **faq_bot** - A Python-based Telegram bot that serves FAQ responses to users
-2. **faq_loader** - A C# application that processes and loads FAQ data
+This project is a Python-based Telegram bot that serves FAQ responses to users using semantic search capabilities.
 
 ## faq_bot Architecture
 
@@ -63,50 +60,6 @@ User Message → Telegram API → Bot Handlers → FAQ Processor → Database �
 - **Simple Bulk Loader** (`simple_bulk_loader.py`) - Basic data loading utility
 - **Smart FAQ Processor** (`smart_faq_processor.py`) - Advanced FAQ processing
 
-## faq_loader Architecture
-
-### Core Components
-
-#### Business Logic Layer (`Business/`)
-- **FAQ Algorithm Service** (`FAQAlgorithmService.cs`) - Main processing engine
-- **Dependency Analyzer** (`DependencyAnalyzer.cs`) - Analyzes relationships between FAQ entries
-- **Semantic Grouper** (`SemanticGrouper.cs`) - Groups similar FAQ entries
-- **Smart Linker** (`SmartLinker.cs`) - Creates intelligent links between entries
-- **Response Optimizer** (`ResponseOptimizer.cs`) - Optimizes FAQ responses
-- **FAQ Models** (`FAQModels.cs`) - Data models and structures
-
-#### Data Access Layer (`Data/`)
-- **Repository Interface** (`IFAQRepository.cs`) - Standard data access interface
-- **JSON Repository** (`JsonFAQRepository.cs`) - JSON-based data storage
-- **SQLite Repository** (`SqliteFAQRepository.cs`) - Database-based storage
-- **Hybrid Repository** (`HybridFAQRepository.cs`) - Combined storage approach
-
-#### Presentation Layer (`Presentation/`)
-- **Main Window** (`Views/MainWindow.xaml`) - Primary application interface
-- **View Model** (`ViewModels/MainViewModel.cs`) - Application logic for UI
-- **Graph Visualization** (`Controls/FAQGraphVisualization.xaml`) - Visual representation of FAQ relationships
-
-### Data Flow
-
-```
-Input Data → Processing Engine → Analysis → Optimization → Output Files
-     ↓           ↓                ↓           ↓              ↓
-  Formats   Algorithms      Relationships  Responses      JSON/DB
-```
-
-## Integration Between Applications
-
-### Data Exchange
-1. **faq_loader** generates `faq.json` - the primary FAQ data file
-2. **faq_loader** can create/update `analytics.db` - the analytics database
-3. **faq_bot** consumes `faq.json` for answering user queries
-4. **faq_bot** uses `analytics.db` for tracking usage statistics
-
-### Synchronization
-- Both applications can work independently
-- Data is synchronized through shared files
-- No direct communication between applications required
-
 ## Technology Stack
 
 ### faq_bot
@@ -115,13 +68,6 @@ Input Data → Processing Engine → Analysis → Optimization → Output Files
 - **Database**: SQLite
 - **ML Libraries**: scikit-learn, numpy, pandas
 - **Build System**: setuptools/pip
-
-### faq_loader
-- **Language**: C# (.NET 6.0)
-- **Framework**: WPF (Windows Presentation Foundation)
-- **Database**: SQLite
-- **Build System**: MSBuild
-- **UI**: XAML
 
 ## Deployment Architecture
 
@@ -151,25 +97,6 @@ Input Data → Processing Engine → Analysis → Optimization → Output Files
 │  │ Manager   │  │    └──────────────────┘
 │  └───────────┘  │
 └─────────────────┘
-
-┌─────────────────┐    ┌──────────────────┐
-│   faq_loader    │    │   Data Sources   │
-│   (C#)          │◄──►│   (Files/DB)     │
-└─────────────────┘    └──────────────────┘
-         │
-         ▼
-┌─────────────────┐    ┌──────────────────┐
-│   Processed     │◄──►│   Output Files   │
-│   Data          │    │                  │
-│                 │    │  ┌────────────┐  │
-│                 │    │  │ faq.json   │  │
-│                 │    │  └────────────┘  │
-│                 │    │                  │
-│                 │    │  ┌────────────┐  │
-│                 │    │  │ analytics. │  │
-│                 │    │  │ db         │  │
-│                 │    │  └────────────┘  │
-└─────────────────┘    └──────────────────┘
 ```
 
 ## Scalability Considerations
@@ -192,15 +119,10 @@ Input Data → Processing Engine → Analysis → Optimization → Output Files
 - Input validation and sanitization
 - Secure storage of sensitive data
 
-### faq_loader
-- File access controls
-- Data validation during processing
-- Secure configuration management
-
 ## Maintenance
 
 ### Regular Tasks
-- Update FAQ data using faq_loader
+- Update FAQ data in faq.json
 - Monitor bot performance and analytics
 - Update dependencies and security patches
 - Backup critical data files

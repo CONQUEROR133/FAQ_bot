@@ -34,7 +34,9 @@ Telegram FAQ bot with semantic search capabilities using Sentence-BERT and FAISS
 - `data/` - FAQ data and database
 - `cache/` - Model embeddings and cache files
 - `files/` - Media files
+- `logs/` - Log files (JSON format)
 - `venv/` - Python virtual environment
+- `tools/` - Utility tools
 
 ## ⚙️ Configuration
 
@@ -68,4 +70,48 @@ Run `4_Train_Model.bat` to retrain the semantic search model with your FAQ data.
 
 ## 📞 Support
 
-For issues, check the logs in `cache/bot.log` or run `5_Check_Status.bat`.
+For issues, check the logs in `logs/bot.log` or run `5_Check_Status.bat`.
+
+## 📊 Log Analysis
+
+The bot now logs all user requests in JSON format. You can analyze these logs using the provided utility:
+
+```cmd
+python tools/aggregate_stats.py
+```
+
+This will show:
+- Total requests
+- Top 20 queries by count
+- Option to export to CSV
+
+Example JSON log entry:
+```json
+{
+  "ts": "2025-09-30 12:00:00,123",
+  "level": "INFO",
+  "logger": "root",
+  "message": "User message received: How do I reset?",
+  "user_id": 12345,
+  "chat_id": 67890,
+  "message_id": 111,
+  "handler": "message_handler"
+}
+```
+
+## 🧪 Testing the Bot
+
+After starting the bot:
+
+1. Open Telegram and search for your bot
+2. Send the `/start` command
+3. Enter the access password when prompted
+4. Ask a question to test the FAQ functionality
+
+## 🧹 Maintenance
+
+### Log Rotation
+Logs are automatically rotated when they reach 10MB, with up to 5 backup files retained.
+
+### Cleaning Cache
+Run `3_Clean_All.bat` to remove cache files while preserving the trained model.

@@ -4,27 +4,17 @@
 
 ```
 Games/
-├── faq_bot/           # Telegram бот для предоставления FAQ (Python)
-│   ├── src/           # Исходный код бота
-│   ├── data/          # Данные FAQ и база данных
-│   ├── utils/         # Вспомогательные утилиты бота
-│   ├── scripts/       # Скрипты управления ботом
-│   ├── templates/     # Шаблоны данных
-│   ├── files/         # Файлы FAQ
-│   ├── tests/         # Тесты
-│   ├── pyproject.toml  # Конфигурация проекта и зависимости бота
-│   ├── .env           # Конфигурация бота
-│   └── README.md      # Документация бота
-│
-├── faq_loader/        # Утилита для загрузки FAQ данных (C#)
-│   ├── Business/      # Бизнес-логика и алгоритмы
-│   ├── Data/          # Репозитории данных
-│   ├── Presentation/  # WPF UI компоненты
-│   ├── Program.cs     # Точка входа
-│   ├── UniversalFAQLoader.sln  # Файл решения Visual Studio
-│   ├── UniversalFAQLoader.csproj  # Проектный файл
-│   ├── .env           # Конфигурация загрузчика
-│   └── README.md      # Документация загрузчика
+└── faq_bot/           # Telegram бот для предоставления FAQ (Python)
+    ├── src/           # Исходный код бота
+    ├── data/          # Данные FAQ и база данных
+    ├── utils/         # Вспомогательные утилиты бота
+    ├── scripts/       # Скрипты управления ботом
+    ├── templates/     # Шаблоны данных
+    ├── files/         # Файлы FAQ
+    ├── tests/         # Тесты
+    ├── pyproject.toml  # Конфигурация проекта и зависимости бота
+    ├── .env           # Конфигурация бота
+    └── README.md      # Документация бота
 ```
 
 ## Описание приложений
@@ -104,76 +94,10 @@ ADMIN_ID=your_telegram_user_id
 ACCESS_PASSWORD=your_access_password
 ```
 
-### faq_loader (C# приложение)
-
-#### Основные компоненты:
-
-##### Business/ - Бизнес-логика
-- `FAQAlgorithmService.cs` - Основной сервис алгоритмов
-- `DependencyAnalyzer.cs` - Анализ зависимостей между FAQ
-- `SemanticGrouper.cs` - Группировка по семантике
-- `SmartLinker.cs` - Умная связь между записями
-- `ResponseOptimizer.cs` - Оптимизация ответов
-- `IFAQAlgorithm.cs` - Интерфейс алгоритмов
-- `FAQModels.cs` - Модели данных
-
-##### Data/ - Репозитории данных
-- `IFAQRepository.cs` - Интерфейс репозитория
-- `JsonFAQRepository.cs` - Репозиторий для JSON данных
-- `SqliteFAQRepository.cs` - Репозиторий для SQLite
-- `HybridFAQRepository.cs` - Гибридный репозиторий
-
-##### Presentation/ - WPF UI
-- `Views/MainWindow.xaml` - Главное окно приложения
-- `ViewModels/MainViewModel.cs` - ViewModel для главного окна
-- `Controls/FAQGraphVisualization.xaml` - Контрол для визуализации графа
-
-##### Файлы проекта
-- `Program.cs` - Точка входа приложения
-- `UniversalFAQLoader.csproj` - проектный файл
-- `UniversalFAQLoader.sln` - файл решения Visual Studio
-
-#### Установка и сборка
-
-##### Требования:
-- .NET 6.0 SDK
-- Visual Studio 2022 или новее (для разработки)
-
-##### Сборка через командную строку:
-
-```bash
-cd faq_loader
-dotnet build
-```
-
-##### Запуск:
-
-```bash
-cd faq_loader
-dotnet run
-```
-
-##### Запуск через bat-скрипт:
-
-```bash
-cd faq_loader
-start_loader.bat
-```
-
-## Связи между приложениями
-
-1. **faq_loader** создает данные для **faq_bot**:
-   - Генерирует faq.json
-   - Может создавать и обновлять analytics.db
-
-2. **faq_bot** использует данные из **faq_loader**:
-   - Загружает faq.json для поиска ответов
-   - Использует analytics.db для статистики
-
 ## Конфигурация
 
-Каждое приложение использует свой файл `.env` для конфигурации.
+Приложение использует файл `.env` для конфигурации.
 
 ## История изменений
 
-Проект был разделен на два независимых приложения и очищен от временных файлов, отчетов и ненужных компонентов. Оставлены только необходимые файлы для работы каждого приложения.
+Проект был очищен от временных файлов, отчетов и ненужных компонентов. Оставлены только необходимые файлы для работы приложения.

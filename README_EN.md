@@ -1,35 +1,22 @@
 # FAQ Management System
 
-This project contains two independent applications for managing a FAQ (Frequently Asked Questions) system:
-
-1. **faq_bot** - A Python-based Telegram bot for providing FAQ responses
-2. **faq_loader** - A C# application for loading and processing FAQ data
+This project contains a Python-based Telegram bot for managing a FAQ (Frequently Asked Questions) system:
 
 ## Project Structure
 
 ```
 Games/
-├── faq_bot/           # Telegram bot for providing FAQ (Python)
-│   ├── src/           # Source code of the bot
-│   ├── data/          # FAQ data and database
-│   ├── utils/         # Bot utility tools
-│   ├── scripts/       # Bot management scripts
-│   ├── templates/     # Data templates
-│   ├── files/         # FAQ related files
-│   ├── tests/         # Tests
-│   ├── pyproject.toml # Project configuration and bot dependencies
-│   ├── .env           # Bot configuration
-│   └── README.md      # Bot documentation
-│
-├── faq_loader/        # Utility for loading FAQ data (C#)
-│   ├── Business/      # Business logic and algorithms
-│   ├── Data/          # Data repositories
-│   ├── Presentation/  # WPF UI components
-│   ├── Program.cs     # Entry point
-│   ├── UniversalFAQLoader.sln  # Visual Studio solution file
-│   ├── UniversalFAQLoader.csproj  # Project file
-│   ├── .env           # Loader configuration
-│   └── README.md      # Loader documentation
+└── faq_bot/           # Telegram bot for providing FAQ (Python)
+    ├── src/           # Source code of the bot
+    ├── data/          # FAQ data and database
+    ├── utils/         # Bot utility tools
+    ├── scripts/       # Bot management scripts
+    ├── templates/     # Data templates
+    ├── files/         # FAQ related files
+    ├── tests/         # Tests
+    ├── pyproject.toml # Project configuration and bot dependencies
+    ├── .env           # Bot configuration
+    └── README.md      # Bot documentation
 ```
 
 ## Applications Overview
@@ -111,77 +98,9 @@ ADMIN_ID=your_telegram_user_id
 ACCESS_PASSWORD=your_access_password
 ```
 
-### faq_loader (C# Application)
-
-A powerful C# application for loading, processing, and analyzing FAQ data with advanced algorithms.
-
-#### Key Components:
-
-##### Business/ - Business logic
-- `FAQAlgorithmService.cs` - Main algorithm service
-- `DependencyAnalyzer.cs` - FAQ dependency analysis
-- `SemanticGrouper.cs` - Semantic grouping
-- `SmartLinker.cs` - Intelligent linking between entries
-- `ResponseOptimizer.cs` - Response optimization
-- `IFAQAlgorithm.cs` - Algorithm interface
-- `FAQModels.cs` - Data models
-
-##### Data/ - Data repositories
-- `IFAQRepository.cs` - Repository interface
-- `JsonFAQRepository.cs` - JSON data repository
-- `SqliteFAQRepository.cs` - SQLite repository
-- `HybridFAQRepository.cs` - Hybrid repository
-
-##### Presentation/ - WPF UI
-- `Views/MainWindow.xaml` - Main application window
-- `ViewModels/MainViewModel.cs` - ViewModel for main window
-- `Controls/FAQGraphVisualization.xaml` - Graph visualization control
-
-##### Project files
-- `Program.cs` - Application entry point
-- `UniversalFAQLoader.csproj` - Project file
-- `UniversalFAQLoader.sln` - Visual Studio solution file
-
-#### Installation and Build
-
-##### Requirements:
-- .NET 6.0 SDK
-- Visual Studio 2022 or newer (for development)
-
-##### Building via command line:
-
-```bash
-cd faq_loader
-dotnet build
-```
-
-##### Running:
-
-```bash
-cd faq_loader
-dotnet run
-```
-
-##### Via batch script:
-
-```bash
-cd faq_loader
-start_loader.bat
-```
-
-## Application Integration
-
-1. **faq_loader** creates data for **faq_bot**:
-   - Generates faq.json
-   - Can create and update analytics.db
-
-2. **faq_bot** uses data from **faq_loader**:
-   - Loads faq.json for searching answers
-   - Uses analytics.db for statistics
-
 ## Configuration
 
-Each application uses its own `.env` file for configuration. See each application's documentation for details.
+The application uses its own `.env` file for configuration. See the application's documentation for details.
 
 ## License
 

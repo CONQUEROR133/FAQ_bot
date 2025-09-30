@@ -1,6 +1,8 @@
 import asyncio
 import logging
 import time
+import json
+import os
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
 from config import config
@@ -9,20 +11,55 @@ from faq_loader import FAQLoader  # type: ignore
 from handlers import router
 from middlewares import DependenciesMiddleware
 from auth_middleware import AuthenticationMiddleware
+import logging.handlers
+
+# Custom JSON formatter for structured logging
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        log_entry = {
+            "ts": self.formatTime(record, self.datefmt),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage()
+        }
+        
+        # Add extra fields if present
+        if hasattr(record, 'user_id'):
+            log_entry["user_id"] = record.user_id
+        if hasattr(record, 'chat_id'):
+            log_entry["chat_id"] = record.chat_id
+        if hasattr(record, 'message_id'):
+            log_entry["message_id"] = record.message_id
+        if hasattr(record, 'handler'):
+            log_entry["handler"] = record.handler
+            
+        return json.dumps(log_entry, ensure_ascii=False)
 
 # Настройка логирования с путем к родительской директории
-import os
-log_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'cache', 'bot.log')
+log_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'bot.log')
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-    handlers=[
-        logging.FileHandler(log_file, encoding='utf-8'),
-        logging.StreamHandler()
-    ]
+# Create logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Create formatter
+json_formatter = JSONFormatter()
+
+# Create file handler with rotation
+file_handler = logging.handlers.RotatingFileHandler(
+    log_file, 
+    maxBytes=10*1024*1024,  # 10MB
+    backupCount=5
 )
+file_handler.setFormatter(json_formatter)
+logger.addHandler(file_handler)
+
+# Create console handler
+console_handler = logging.StreamHandler()
+console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+console_handler.setFormatter(console_formatter)
+logger.addHandler(console_handler)
 
 # Устанавливаем более детальное логирование для сетевых ошибок
 logging.getLogger('aiogram.dispatcher').setLevel(logging.WARNING)
