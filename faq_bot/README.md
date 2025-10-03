@@ -4,7 +4,17 @@ Telegram FAQ bot with semantic search capabilities using Sentence-BERT and FAISS
 
 ## 🚀 Quick Start
 
-### For Command Prompt (cmd)
+### Simplified Setup (Recommended)
+```cmd
+# Launch the console setup tool
+setup.bat
+
+# Start the bot
+start.bat
+```
+
+### Manual Setup (Alternative)
+If you prefer the traditional approach:
 ```cmd
 # Initial setup (run once)
 0_Setup.bat
@@ -50,10 +60,19 @@ Telegram FAQ bot with semantic search capabilities using Sentence-BERT and FAISS
 
 ## 🧠 Training the Model
 
+### Using Setup Tool (Recommended)
+Run `setup.bat` and select option 2 to train the model.
+
+### Manual Method
 Run `4_Train_Model.bat` to retrain the semantic search model with your FAQ data.
 
 ## 🛠 Scripts
 
+### New Simplified Scripts
+- `setup.bat` - Launch console setup tool (Setup, Train, Start options)
+- `start.bat` - Start bot directly without PowerShell
+
+### Traditional Scripts
 - `0_Setup.bat` - Initial setup
 - `1_Start_Bot.bat` - Start bot (for cmd)
 - `start.ps1` - Start bot (for PowerShell)

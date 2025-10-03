@@ -4,6 +4,25 @@ This document describes all batch scripts available in the FAQ Bot project.
 
 ## 📁 Available Scripts
 
+### New Simplified Scripts
+
+### setup.bat
+Launches the console setup tool with options for:
+- Setting up the bot environment
+- Training the ML model
+- Starting the bot
+- Cleaning cache
+- Checking system status
+
+### start.bat
+Starts the FAQ bot directly without PowerShell dependencies:
+- Validates required files
+- Activates virtual environment
+- Starts the bot with error handling
+- Shows logs and statistics
+
+### Traditional Scripts
+
 ### 0_Setup.bat
 Initial setup script that:
 - Creates Python virtual environment
@@ -52,6 +71,15 @@ System status checker:
 - Shows system information
 
 ## 🛠 Usage Instructions
+
+### Simplified Setup (Recommended)
+```cmd
+# Launch console setup tool
+setup.bat
+
+# Start bot
+start.bat
+```
 
 ### For Command Prompt (cmd)
 ```cmd
