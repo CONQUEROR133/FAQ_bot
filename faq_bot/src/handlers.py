@@ -1384,3 +1384,4 @@ async def message_handler(
     
     # Логирование результата
     db.log_query(text, success=True)
+

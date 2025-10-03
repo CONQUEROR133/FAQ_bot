@@ -2,207 +2,151 @@
 chcp 65001 > nul
 setlocal enabledelayedexpansion
 title FAQ Bot - Status Check
-echo 🔍 Проверка статуса FAQ бота...
+echo 🔍 Проверка состояния FAQ бота...
 echo.
 
 cd /d "%~dp0"
 
-echo 📊 Системная информация:
-echo    Дата и время: %date% %time%
-echo    Текущая директория: %cd%
-echo.
-
-:: Проверка наличия необходимых файлов
-echo 🔍 Проверка файлов проекта...
-set FILES_CHECKED=0
-set FILES_FOUND=0
-
-for %%f in (run_bot.py src\main.py data\faq.json .env) do (
-    set /a FILES_CHECKED+=1
-    if exist %%f (
-        echo ✅ %%f найден
-        set /a FILES_FOUND+=1
-    ) else (
-        echo ❌ %%f не найден
-    )
-)
-
-echo    Проверено файлов: !FILES_CHECKED!
-echo    Найдено файлов: !FILES_FOUND!
-echo.
-
-:: Проверка виртуального окружения
-echo 🔍 Проверка виртуального окружения...
-if exist venv (
-    echo ✅ Виртуальное окружение найдено
-    if exist venv\Scripts\activate.bat (
-        echo ✅ Скрипт активации найден
-    ) else (
-        echo ❌ Скрипт активации не найден
-    )
-) else (
-    echo ⚠️ Виртуальное окружение не найдено
-)
-
-echo.
-
-:: Проверка установленных пакетов
-echo 🔍 Проверка установленных пакетов...
-if exist venv\Scripts\activate.bat (
-    call venv\Scripts\activate.bat >nul 2>&1
-)
-
 :: Проверка Python
+echo 🔧 Проверка Python...
 python --version >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo ❌ Python не найден
+    echo Установите Python 3.8+ и добавьте в PATH
 ) else (
-    for /f "tokens=* usebackq" %%i in (`python --version`) do set PYTHON_VERSION=%%i
-    echo ✅ !PYTHON_VERSION!
+    for /f "tokens=*" %%i in ('python --version') do set PYTHON_VERSION=%%i
+    echo ✅ %PYTHON_VERSION% найден
 )
 
-:: Проверка ключевых пакетов
-set PACKAGES_CHECKED=0
-set PACKAGES_FOUND=0
+:: Проверка pip
+echo.
+echo 🔧 Проверка pip...
+pip --version >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo ❌ pip не найден
+    echo Установите Python с pip или установите pip отдельно
+) else (
+    for /f "tokens=*" %%i in ('pip --version') do set PIP_VERSION=%%i
+    echo ✅ %PIP_VERSION% найден
+)
 
-for %%p in (aiogram sentence-transformers faiss-cpu psutil) do (
-    set /a PACKAGES_CHECKED+=1
-    python -c "import %%p" >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo ✅ %%p установлен
-        set /a PACKAGES_FOUND+=1
+:: Проверка виртуального окружения
+echo.
+echo 🔧 Проверка виртуального окружения...
+if exist venv\Scripts\activate.bat (
+    echo ✅ Виртуальное окружение найдено
+    call venv\Scripts\activate.bat >nul 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        echo ⚠️ Ошибка активации виртуального окружения
     ) else (
-        echo ❌ %%p не установлен
+        echo ✅ Виртуальное окружение активировано
     )
-)
-
-echo    Проверено пакетов: !PACKAGES_CHECKED!
-echo    Установлено пакетов: !PACKAGES_FOUND!
-echo.
-
-:: Проверка запущенных процессов
-echo 🔍 Проверка запущенных процессов...
-set BOT_RUNNING=0
-
-:: Поиск по заголовку окна
-for /f "tokens=*" %%i in ('tasklist /v /fo csv ^| findstr /i "FAQ Bot - Running" 2^>nul') do (
-    set BOT_RUNNING=1
-    echo ✅ Бот запущен ^(по заголовку окна^)
-)
-
-:: Поиск по имени процесса
-if !BOT_RUNNING! EQU 0 (
-    for /f "tokens=*" %%i in ('tasklist /v /fo csv ^| findstr /i python ^| findstr /i "run_bot.py" 2^>nul') do (
-        set BOT_RUNNING=1
-        echo ✅ Бот запущен ^(по имени процесса^)
-    )
-)
-
-if !BOT_RUNNING! EQU 0 (
-    echo ⚠️ Бот не запущен
-)
-
-echo.
-
-:: Проверка файлов данных
-echo 🔍 Проверка файлов данных...
-if exist data\faq.json (
-    for %%A in (data\faq.json) do (
-        set FAQ_SIZE=%%~zA
-    )
-    echo ✅ faq.json: !FAQ_SIZE! байт
 ) else (
-    echo ❌ faq.json не найден
+    echo ⚠️ Виртуальное окружение не найдено
+    echo Запустите 0_Setup.bat для создания
 )
+
+:: Проверка необходимых пакетов
+echo.
+echo 🔧 Проверка необходимых пакетов...
+set REQUIRED_PACKAGES=aiogram sentence-transformers python-dotenv faiss-cpu psutil
+set MISSING_PACKAGES=
+
+for %%p in (%REQUIRED_PACKAGES%) do (
+    pip show %%p >nul 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        set MISSING_PACKAGES=!MISSING_PACKAGES! %%p
+        echo ❌ %%p не установлен
+    ) else (
+        echo ✅ %%p установлен
+    )
+)
+
+if defined MISSING_PACKAGES (
+    echo.
+    echo ⚠️ Некоторые пакеты отсутствуют: !MISSING_PACKAGES!
+    echo Запустите 0_Setup.bat для установки зависимостей
+)
+
+:: Проверка конфигурационных файлов
+echo.
+echo 🔧 Проверка конфигурационных файлов...
+
+if exist .env (
+    echo ✅ Файл .env найден
+) else (
+    echo ⚠️ Файл .env не найден
+    echo Создайте .env файл или запустите 0_Setup.bat
+)
+
+if exist data\faq.json (
+    echo ✅ Файл data\faq.json найден
+) else (
+    echo ⚠️ Файл data\faq.json не найден
+    echo Добавьте данные в faq.json
+)
+
+if exist cache (
+    echo ✅ Директория cache найдена
+) else (
+    echo ⚠️ Директория cache не найдена
+    echo Создайте директорию cache или запустите 0_Setup.bat
+)
+
+:: Проверка скриптов
+echo.
+echo 🔧 Проверка скриптов...
+
+if exist run_bot.py (
+    echo ✅ run_bot.py найден
+) else (
+    echo ❌ run_bot.py не найден
+)
+
+if exist src\main.py (
+    echo ✅ src\main.py найден
+) else (
+    echo ❌ src\main.py не найден
+)
+
+:: Проверка модели (опционально)
+echo.
+echo 🔧 Проверка модели...
 
 if exist cache\faq_embeddings.pkl (
-    for %%A in (cache\faq_embeddings.pkl) do (
-        set EMBEDDINGS_SIZE=%%~zA
-    )
-    echo ✅ faq_embeddings.pkl: !EMBEDDINGS_SIZE! байт
+    echo ✅ Эмбеддинги модели найдены
 ) else (
-    echo ⚠️ faq_embeddings.pkl не найден ^(может быть создан при первом запуске^)
+    echo ⚠️ Эмбеддинги модели не найдены
+    echo Запустите 4_Train_Model.bat для создания
 )
 
 if exist cache\faq_index.faiss (
-    for %%A in (cache\faq_index.faiss) do (
-        set INDEX_SIZE=%%~zA
-    )
-    echo ✅ faq_index.faiss: !INDEX_SIZE! байт
+    echo ✅ Индекс модели найден
 ) else (
-    echo ⚠️ faq_index.faiss не найден ^(может быть создан при первом запуске^)
+    echo ⚠️ Индекс модели не найден
+    echo Запустите 4_Train_Model.bat для создания
 )
 
-if exist cache\bot.log (
-    for %%A in (cache\bot.log) do (
-        set LOG_SIZE=%%~zA
-    )
-    echo ✅ bot.log: !LOG_SIZE! байт
+:: Информация о системе
+echo.
+echo 🔧 Информация о системе...
+echo Система: %OS%
+echo Архитектура: %PROCESSOR_ARCHITECTURE%
+echo Каталог: %CD%
+
+:: Статистика кэша
+echo.
+echo 📊 Статистика кэша...
+if exist cache (
+    for /f "tokens=*" %%i in ('dir cache /b /a-d ^| find /c /v ""') do set CACHE_FILES=%%i
+    echo Файлов в кэше: !CACHE_FILES!
 ) else (
-    echo ⚠️ bot.log не найден ^(будет создан при запуске бота^)
+    echo Кэш не найден
 )
 
 echo.
-
-:: Проверка конфигурации
-echo 🔍 Проверка конфигурации...
-if exist .env (
-    echo ✅ .env файл найден
-    :: Проверка наличия ключевых переменных
-    findstr /i "BOT_TOKEN" .env >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo ✅ BOT_TOKEN найден в .env
-    ) else (
-        echo ⚠️ BOT_TOKEN не найден в .env
-    )
-    
-    findstr /i "ADMIN_ID" .env >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo ✅ ADMIN_ID найден в .env
-    ) else (
-        echo ⚠️ ADMIN_ID не найден в .env
-    )
-    
-    findstr /i "ACCESS_PASSWORD" .env >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo ✅ ACCESS_PASSWORD найден в .env
-    ) else (
-        echo ⚠️ ACCESS_PASSWORD не найден в .env
-    )
-) else (
-    echo ❌ .env файл не найден
-)
-
+echo 🎉 Проверка состояния завершена!
 echo.
-
-:: Рекомендации
-echo 📋 Рекомендации:
-if !FILES_FOUND! LSS !FILES_CHECKED! (
-    echo ⚠️  Некоторые необходимые файлы отсутствуют. Запустите 0_Setup.bat
-)
-
-if !PACKAGES_FOUND! LSS !PACKAGES_CHECKED! (
-    echo ⚠️  Некоторые пакеты не установлены. Запустите 0_Setup.bat
-)
-
-if !BOT_RUNNING! EQU 0 (
-    echo 💡  Для запуска бота используйте 1_Start_Bot.bat
-) else (
-    echo 💡  Для остановки бота используйте 2_Stop_bot.bat
-)
-
-echo.
-echo 📊 Сводка проверки:
-echo    Статус файлов: !FILES_FOUND!/!FILES_CHECKED!
-echo    Статус пакетов: !PACKAGES_FOUND!/!PACKAGES_CHECKED!
-if !BOT_RUNNING! EQU 1 (
-    echo    Статус бота: Запущен
-) else (
-    echo    Статус бота: Остановлен
-)
-
-echo.
-echo 🎉 Проверка завершена!
 echo Нажмите любую клавишу для выхода...
 pause >nul
 endlocal

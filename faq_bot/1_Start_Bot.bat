@@ -66,8 +66,6 @@ python run_bot.py
 set EXIT_CODE=%ERRORLEVEL%
 
 echo.
-echo Код завершения: %EXIT_CODE%
-
 if "%EXIT_CODE%"=="0" (
     echo ✅ Бот остановлен нормально
 ) else (
