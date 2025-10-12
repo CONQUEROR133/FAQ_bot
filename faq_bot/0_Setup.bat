@@ -2,109 +2,109 @@
 chcp 65001 > nul
 setlocal enabledelayedexpansion
 title FAQ Bot - Setup & Installation
-echo 🔧 Настройка FAQ бота...
+echo 🔧 Setting up FAQ Bot...
 echo.
 
-:: Проверка Python
+:: Check Python
 python --version >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo ❌ Python не найден! Установите Python 3.8+ и добавьте в PATH
-    echo Нажмите любую клавишу для выхода...
+    echo ❌ Python not found! Please install Python 3.8+ and add it to PATH
+    echo Press any key to exit...
     pause >nul
     exit /b 1
 )
 
-:: Получаем версию Python
+:: Get Python version
 for /f "tokens=*" %%i in ('python --version') do set PYTHON_VERSION=%%i
 echo ✅ %PYTHON_VERSION%
 
-:: Проверка pip
+:: Check pip
 pip --version >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo ❌ pip не найден! Проверьте установку Python
-    echo Нажмите любую клавишу для выхода...
+    echo ❌ pip not found! Please check Python installation
+    echo Press any key to exit...
     pause >nul
     exit /b 1
 )
 
-:: Получаем версию pip
+:: Get pip version
 for /f "tokens=*" %%i in ('pip --version') do set PIP_VERSION=%%i
 echo ✅ %PIP_VERSION%
 
-:: Создание виртуального окружения если не существует
+:: Create virtual environment if it doesn't exist
 echo.
-echo 📦 Настройка виртуального окружения...
+echo 📦 Setting up virtual environment...
 if exist venv (
-    echo ⚠️ Виртуальное окружение уже существует
-    echo Удалить существующее виртуальное окружение? (y/n)
+    echo ⚠️ Virtual environment already exists
+    echo Delete existing virtual environment? (y/n)
     set /p DELETE_VENV=
     if /i "!DELETE_VENV!"=="y" (
-        echo 🗑️ Удаление существующего виртуального окружения...
+        echo 🗑️ Deleting existing virtual environment...
         rd /s /q venv
         if !ERRORLEVEL! NEQ 0 (
-            echo ❌ Ошибка удаления виртуального окружения
+            echo ❌ Error deleting virtual environment
             pause >nul
             exit /b 1
         )
-        echo ✅ Существующее виртуальное окружение удалено
+        echo ✅ Existing virtual environment deleted
     )
 )
 
-:: Создание нового виртуального окружения
+:: Create new virtual environment
 if not exist venv (
-    echo 🛠️ Создание нового виртуального окружения...
+    echo 🛠️ Creating new virtual environment...
     python -m venv venv
     if %ERRORLEVEL% NEQ 0 (
-        echo ❌ Ошибка создания виртуального окружения
+        echo ❌ Error creating virtual environment
         pause >nul
         exit /b 1
     )
-    echo ✅ Виртуальное окружение создано
+    echo ✅ Virtual environment created
 )
 
-:: Активация виртуального окружения
-echo 📋 Активация виртуального окружения...
+:: Activate virtual environment
+echo 📋 Activating virtual environment...
 call venv\Scripts\activate.bat
 if %ERRORLEVEL% NEQ 0 (
-    echo ❌ Ошибка активации виртуального окружения
+    echo ❌ Error activating virtual environment
     pause >nul
     exit /b 1
 )
 
-echo ✅ Виртуальное окружение активировано
+echo ✅ Virtual environment activated
 
-:: Обновление pip до последней версии
-echo 🔄 Обновление pip...
+:: Upgrade pip to latest version
+echo 🔄 Upgrading pip...
 python -m pip install --upgrade pip >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo ⚠️ Не удалось обновить pip (продолжаем с текущей версией)
+    echo ⚠️ Failed to upgrade pip (continuing with current version)
 ) else (
-    echo ✅ pip обновлен
+    echo ✅ pip upgraded
 )
 
-:: Установка зависимостей
+:: Install dependencies
 echo.
-echo 📦 Установка зависимостей...
+echo 📦 Installing dependencies...
 if exist pyproject.toml (
-    echo 🛠️ Установка зависимостей из pyproject.toml...
+    echo 🛠️ Installing dependencies from pyproject.toml...
     pip install -e .
     if !ERRORLEVEL! NEQ 0 (
-        echo ❌ Ошибка установки зависимостей из pyproject.toml
-        echo Попробовать установить зависимости из requirements.txt?
+        echo ❌ Error installing dependencies from pyproject.toml
+        echo Try installing dependencies from requirements.txt?
         echo (y/n)
         set /p TRY_REQUIREMENTS=
         if /i "!TRY_REQUIREMENTS!"=="y" (
             if exist requirements.txt (
-                echo 🛠️ Установка зависимостей из requirements.txt...
+                echo 🛠️ Installing dependencies from requirements.txt...
                 pip install -r requirements.txt
                 if !ERRORLEVEL! NEQ 0 (
-                    echo ❌ Ошибка установки зависимостей из requirements.txt
+                    echo ❌ Error installing dependencies from requirements.txt
                     pause >nul
                     exit /b 1
                 )
-                echo ✅ Зависимости из requirements.txt установлены
+                echo ✅ Dependencies from requirements.txt installed
             ) else (
-                echo ❌ requirements.txt не найден
+                echo ❌ requirements.txt not found
                 pause >nul
                 exit /b 1
             )
@@ -113,43 +113,43 @@ if exist pyproject.toml (
             exit /b 1
         )
     ) else (
-        echo ✅ Зависимости из pyproject.toml установлены
+        echo ✅ Dependencies from pyproject.toml installed
     )
 ) else if exist requirements.txt (
-    echo 🛠️ Установка зависимостей из requirements.txt...
+    echo 🛠️ Installing dependencies from requirements.txt...
     pip install -r requirements.txt
     if !ERRORLEVEL! NEQ 0 (
-        echo ❌ Ошибка установки зависимостей из requirements.txt
+        echo ❌ Error installing dependencies from requirements.txt
         pause >nul
         exit /b 1
     )
-    echo ✅ Зависимости из requirements.txt установлены
+    echo ✅ Dependencies from requirements.txt installed
 ) else (
-    echo ⚠️ Файлы зависимостей не найдены (pyproject.toml или requirements.txt)
-    echo Установка минимальных зависимостей...
+    echo ⚠️ Dependency files not found (pyproject.toml or requirements.txt)
+    echo Installing minimal dependencies...
     pip install aiogram sentence-transformers python-dotenv faiss-cpu psutil
     if !ERRORLEVEL! NEQ 0 (
-        echo ❌ Ошибка установки минимальных зависимостей
+        echo ❌ Error installing minimal dependencies
         pause >nul
         exit /b 1
     )
-    echo ✅ Минимальные зависимости установлены
+    echo ✅ Minimal dependencies installed
 )
 
-:: Проверка конфигурации
+:: Check configuration
 echo.
-echo 🔍 Проверка конфигурации...
+echo 🔍 Checking configuration...
 
 if not exist .env (
-    echo ⚠️ Файл .env не найден
-    echo Создание шаблона .env файла...
+    echo ⚠️ .env file not found
+    echo Creating .env template...
     (
         echo # Telegram Bot Configuration
         echo BOT_TOKEN=your_telegram_bot_token_here
         echo ADMIN_ID=your_telegram_user_id_here
         echo ACCESS_PASSWORD=your_access_password_here
         echo.
-        echo # ML Model Configuration (оптимизировано для i5-4570, 16GB RAM)
+        echo # ML Model Configuration (optimized for i5-4570, 16GB RAM)
         echo MODEL_NAME=ai-forever/ru-en-RoSBERTa
         echo SIMILARITY_THRESHOLD=0.73
         echo BATCH_SIZE=16
@@ -163,63 +163,83 @@ if not exist .env (
         echo MAX_RETRIES=3
         echo RETRY_DELAY=1
     ) > .env
-    echo ✅ Шаблон .env создан. Пожалуйста, отредактируйте его с вашими данными.
+    echo ✅ .env template created. Please edit it with your data.
 ) else (
-    echo ✅ Файл .env найден
+    echo ✅ .env file found
+)
+
+:: Check if ACCESS_PASSWORD is secure
+echo 🔍 Checking password security...
+findstr /C:"ACCESS_PASSWORD=" .env > temp_pass.txt
+set /p PASSWORD_LINE=<temp_pass.txt
+del temp_pass.txt
+for /f "tokens=2 delims==" %%a in ("%PASSWORD_LINE%") do set ACCESS_PASSWORD=%%a
+
+:: Check password strength
+if "!ACCESS_PASSWORD!"=="your_access_password_here" (
+    echo ⚠️ Default password detected!
+    echo For security reasons, please change the default password in .env
+    echo Recommended: Use a strong password with at least 8 characters including letters, numbers, and symbols
+) else if "!ACCESS_PASSWORD!"=="" (
+    echo ⚠️ No password found in .env
+    echo Please set a strong ACCESS_PASSWORD in .env
+) else (
+    echo ✅ Password found in .env
+    echo 🔐 For production use, ensure your password is strong and secure
 )
 
 if not exist data (
-    echo 📁 Создание директории data...
+    echo 📁 Creating data directory...
     mkdir data
-    echo ✅ Директория data создана
+    echo ✅ Data directory created
 )
 
 if not exist data\faq.json (
-    echo ⚠️ Файл faq.json не найден
-    echo Создание шаблона faq.json...
+    echo ⚠️ faq.json file not found
+    echo Creating faq.json template...
     (
         echo []
     ) > data\faq.json
-    echo ✅ Шаблон faq.json создан
+    echo ✅ faq.json template created
 ) else (
-    echo ✅ Файл faq.json найден
+    echo ✅ faq.json file found
 )
 
 if not exist cache (
-    echo 📁 Создание директории cache...
+    echo 📁 Creating cache directory...
     mkdir cache
-    echo ✅ Директория cache создана
+    echo ✅ Cache directory created
 )
 
 if not exist files (
-    echo 📁 Создание директории files...
+    echo 📁 Creating files directory...
     mkdir files
-    echo ✅ Директория files создана
+    echo ✅ Files directory created
 )
 
 echo.
-echo 📊 Установка дополнительных инструментов разработки (опционально)...
-echo Установить инструменты разработки? (y/n)
+echo 📊 Installing development tools (optional)...
+echo Install development tools? (y/n)
 set /p INSTALL_DEV=
 if /i "!INSTALL_DEV!"=="y" (
-    echo 🛠️ Установка инструментов разработки...
+    echo 🛠️ Installing development tools...
     pip install black flake8 mypy pytest pytest-cov pytest-asyncio
     if !ERRORLEVEL! EQU 0 (
-        echo ✅ Инструменты разработки установлены
+        echo ✅ Development tools installed
     ) else (
-        echo ⚠️ Ошибка установки инструментов разработки
+        echo ⚠️ Error installing development tools
     )
 )
 
 echo.
-echo 🎉 Настройка завершена!
+echo 🎉 Setup completed!
 echo.
-echo Следующие шаги:
-echo 1. Отредактируйте файл .env с вашими данными
-echo 2. Добавьте данные в файл data\faq.json
-echo 3. Используйте 1_Start_Bot.bat для запуска бота
+echo Next steps:
+echo 1. Edit the .env file with your data
+echo 2. Add data to data\faq.json
+echo 3. Use 1_Start_Bot.bat to start the bot
 
 echo.
-echo Нажмите любую клавишу для выхода...
+echo Press any key to exit...
 pause >nul
 endlocal

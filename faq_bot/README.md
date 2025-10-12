@@ -175,6 +175,42 @@ After starting the bot:
 3. Enter the access password when prompted
 4. Ask a question to test the FAQ functionality
 
+## 📄 FAQ Data Format
+
+The bot uses a JSON file (`data/faq.json`) to store FAQ entries. Here's an example format:
+
+```json
+[
+  {
+    "query": "How to reset password",
+    "variations": [
+      "reset password",
+      "forgot password",
+      "password reset"
+    ],
+    "response": "To reset your password, follow these steps:",
+    "resources": [
+      {
+        "title": "Password Reset Guide",
+        "type": "file",
+        "files": ["files/password_reset.pdf"]
+      },
+      {
+        "title": "Video Tutorial",
+        "type": "link",
+        "link": "https://example.com/reset-password-video"
+      }
+    ],
+    "metadata": {
+      "source_type": "manual",
+      "confidence": 0.95,
+      "processed_at": "2025-01-01T10:00:00.000000",
+      "hash": "reset_password"
+    }
+  }
+]
+```
+
 ## 🧹 Maintenance
 
 ### Log Rotation

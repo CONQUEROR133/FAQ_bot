@@ -3,7 +3,7 @@ import os
 from aiogram import types, Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.exceptions import TelegramRetryAfter, TelegramNetworkError
-from aiogram.filters import Command, CommandStart  # Filters for handling /start and other commands
+from aiogram.filters import Command, CommandStart
 
 from utils import send_file_with_retry, remove_keyboard, send_callback_answer
 

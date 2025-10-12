@@ -40,8 +40,9 @@ Thumbs.db
 bot.log
 logs/
 *.db
-# faq_embeddings.pkl  # Commented out to allow tracking of model files
-# faq_index.faiss     # Commented out to allow tracking of model files
+faq_embeddings.pkl
+faq_index.faiss
+cache/
 
 # Environment variables
 .env
