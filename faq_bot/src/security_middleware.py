@@ -1,7 +1,6 @@
-import time
 import logging
-from typing import Dict, Any, Callable, Awaitable, Optional, Set
-from collections import defaultdict, deque
+from typing import Dict, Any, Callable, Awaitable, Optional
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
@@ -219,19 +218,19 @@ class SecurityMiddleware(BaseMiddleware):
                 if isinstance(event, Message):
                     try:
                         await event.answer("🚫 Доступ временно ограничен. Попробуйте позже.")
-                    except:
+                    except Exception:
                         pass
                 return
             
             # Check rate limiting
             if self.config.security.enable_rate_limiting and activity.is_rate_limited():
-                self.log_security_event("RATE_LIMIT_EXCEEDED", user_id, 
+                self.log_security_event("RATE_LIMIT_EXCEEDED", user_id,
                                       f"Requests: {activity.get_requests_in_window(1)}/min, {activity.get_requests_in_window(60)}/hour")
                 
                 if isinstance(event, Message):
                     try:
                         await event.answer("⏰ Слишком много запросов. Подождите немного.")
-                    except:
+                    except Exception:
                         pass
                 return
             
@@ -244,7 +243,7 @@ class SecurityMiddleware(BaseMiddleware):
                     if isinstance(event, Message):
                         try:
                             await event.answer("❌ Недопустимое содержимое сообщения.")
-                        except:
+                        except Exception:
                             pass
                     return
             
@@ -269,7 +268,7 @@ class SecurityMiddleware(BaseMiddleware):
                 # Safely extract user_id, handling cases where user might not be defined
                 user_id = user.id if user is not None else 0
                 self.log_security_event("MIDDLEWARE_ERROR", user_id, str(e))
-            except:
+            except Exception:
                 self.log_security_event("MIDDLEWARE_ERROR", 0, str(e))
             return await handler(event, data)
     

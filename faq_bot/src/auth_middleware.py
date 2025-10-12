@@ -1,42 +1,10 @@
+from aiogram import BaseMiddleware
 from typing import Callable, Awaitable, Any, Dict
+from aiogram.types import Message, CallbackQuery
 import logging
 
-# Define BaseMiddleware class that works in all environments
-class BaseMiddleware:
-    """Base class for middleware"""
-    async def __call__(
-        self, 
-        handler: Callable[[Any, Dict[str, Any]], Awaitable[Any]], 
-        event: Any, 
-        data: Dict[str, Any]
-    ) -> Any:
-        return await handler(event, data)
-
-# Try to import aiogram classes
-try:
-    from aiogram.types import Message, CallbackQuery, TelegramObject
-except ImportError:
-    # Fallback classes for development environments
-    class Message:
-        def __init__(self):
-            self.from_user = None
-            self.text = ""
-        
-        async def answer(self, text, *args, **kwargs):
-            pass
-    
-    class CallbackQuery:
-        def __init__(self):
-            self.from_user = None
-            
-        async def answer(self, text, show_alert=False, *args, **kwargs):
-            pass
-        
-    class TelegramObject:
-        pass
-
 class AuthenticationMiddleware(BaseMiddleware):
-    """Middleware для проверки аутентификации пользователей"""
+    """Middleware for checking user authentication"""
     
     def __init__(self, db_instance, config_instance):
         self.db = db_instance
@@ -48,7 +16,7 @@ class AuthenticationMiddleware(BaseMiddleware):
         event: Any,
         data: Dict[str, Any]
     ) -> Any:
-        # Получаем пользователя из события
+        # Get user from event
         user = None
         if isinstance(event, (Message, CallbackQuery)):
             user = event.from_user
@@ -56,42 +24,42 @@ class AuthenticationMiddleware(BaseMiddleware):
         if not user:
             return await handler(event, data)
         
-        # Проверяем команды, которые не требуют аутентификации
+        # Check commands that don't require authentication
         if isinstance(event, Message) and event.text:
-            # Разрешаем /start для всех (нужно для аутентификации)
+            # Allow /start for everyone (needed for authentication)
             if event.text.strip() == '/start':
                 return await handler(event, data)
         
-        # Проверяем, является ли пользователь админом (админ не нуждается в аутентификации)
+        # Check if user is admin (admin doesn't need authentication)
         if user and user.id == self.config.ADMIN_ID:
             return await handler(event, data)
         
-        # Проверяем, ожидает ли пользователь ввода пароля
-        # Импортируем waiting_for_password из handlers
+        # Check if user is waiting for password input
+        # Import waiting_for_password from handlers
         try:
             from handlers import waiting_for_password
             if user and user.id in waiting_for_password:
-                # Пользователь ожидает ввода пароля - разрешаем обработку
+                # User is waiting for password input - allow processing
                 return await handler(event, data)
         except ImportError:
-            # Если не можем импортировать, продолжаем без проверки
+            # If we can't import, continue without checking
             pass
         
-        # Проверяем аутентификацию в базе данных
+        # Check authentication in database
         if user and not self.db.is_user_authenticated(user.id):
-            # Пользователь не аутентифицирован
+            # User is not authenticated
             if isinstance(event, Message):
                 await event.answer(
-                    "🔒 Для доступа к боту выполните команду /start и введите пароль."
+                    "🔒 To access the bot, run the /start command and enter the password."
                 )
             elif isinstance(event, CallbackQuery):
                 await event.answer(
-                    "🔒 Сессия истекла. Выполните /start для повторной аутентификации.",
+                    "🔒 Session expired. Run /start to re-authenticate.",
                     show_alert=True
                 )
             
-            logging.warning(f"Неаутентифицированный доступ от пользователя {user.id}")
-            return  # Прерываем выполнение
+            logging.warning(f"Unauthenticated access from user {user.id}")
+            return  # Interrupt execution
         
-        # Пользователь аутентифицирован, продолжаем обработку
+        # User is authenticated, continue processing
         return await handler(event, data)

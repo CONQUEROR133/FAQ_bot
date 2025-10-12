@@ -322,10 +322,6 @@ class PerformanceManager:
         # Get memory before optimization
         before_mb = psutil.Process().memory_info().rss / 1024 / 1024
         
-        # Clear old cache entries
-        query_stats_before = self.query_cache.stats()
-        embedding_stats_before = self.embedding_cache.stats()
-        
         # Trigger garbage collection
         collected = gc.collect()
         

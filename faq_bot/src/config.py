@@ -2,7 +2,7 @@ import os
 import logging
 import re
 import html
-from typing import List, Optional, Union, Pattern
+from typing import List, Optional, Pattern
 from dataclasses import dataclass
 from pathlib import Path
 from dotenv import load_dotenv

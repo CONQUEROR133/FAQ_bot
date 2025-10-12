@@ -9,6 +9,7 @@ from config import config
 from database import Database
 from faq_loader import FAQLoader  # type: ignore
 from handlers import router
+from health import router as health_router
 from middlewares import DependenciesMiddleware
 from auth_middleware import AuthenticationMiddleware
 import logging.handlers
@@ -35,7 +36,7 @@ class JSONFormatter(logging.Formatter):
             
         return json.dumps(log_entry, ensure_ascii=False)
 
-# Настройка логирования с путем к родительской директории
+# Setup logging with path to parent directory
 log_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'bot.log')
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
@@ -61,88 +62,88 @@ console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - 
 console_handler.setFormatter(console_formatter)
 logger.addHandler(console_handler)
 
-# Устанавливаем более детальное логирование для сетевых ошибок
+# Set more detailed logging for network errors
 logging.getLogger('aiogram.dispatcher').setLevel(logging.WARNING)
 logging.getLogger('aiogram.event').setLevel(logging.WARNING)
 
-# Глобальная переменная для отслеживания времени запуска
+# Global variable to track startup time
 START_TIME = time.time()
 
 async def start_polling_with_retry(bot: Bot, dp: Dispatcher, max_retries: int = 5):
-    """Запуск polling с автоматическим переподключением при ошибках"""
+    """Start polling with automatic reconnection on errors"""
     retry_count = 0
     
     while retry_count < max_retries:
         try:
-            logging.info(f"Запуск polling (попытка {retry_count + 1}/{max_retries})")
+            logging.info(f"Starting polling (attempt {retry_count + 1}/{max_retries})")
             await dp.start_polling(bot)
-            break  # Если дошли сюда, значит polling завершился нормально
+            break  # If we got here, polling ended normally
             
         except TelegramNetworkError as e:
             retry_count += 1
-            wait_time = min(30, 5 * retry_count)  # Прогрессивная задержка: 5, 10, 15, 20, 25 сек
+            wait_time = min(30, 5 * retry_count)  # Progressive delay: 5, 10, 15, 20, 25 sec
             
-            logging.error(f"Сетевая ошибка: {e}")
+            logging.error(f"Network error: {e}")
             
             if retry_count < max_retries:
-                logging.warning(f"Попытка переподключения через {wait_time} сек...")
+                logging.warning(f"Attempting to reconnect in {wait_time} seconds...")
                 await asyncio.sleep(wait_time)
             else:
-                logging.error("Превышено максимальное количество попыток переподключения")
+                logging.error("Maximum reconnection attempts exceeded")
                 raise
                 
         except TelegramRetryAfter as e:
-            logging.warning(f"Требуется ожидание {e.retry_after} сек. перед повторной попыткой")
+            logging.warning(f"Waiting required {e.retry_after} seconds before retrying")
             await asyncio.sleep(e.retry_after)
-            # Не увеличиваем retry_count для ограничений API
+            # Don't increment retry_count for API limits
             
         except Exception as e:
             retry_count += 1
-            logging.error(f"Непредвиденная ошибка: {e}")
+            logging.error(f"Unexpected error: {e}")
             
             if retry_count < max_retries:
-                wait_time = min(60, 10 * retry_count)  # Длинная задержка для непредвиденных ошибок
-                logging.warning(f"Попытка перезапуска через {wait_time} сек...")
+                wait_time = min(60, 10 * retry_count)  # Long delay for unexpected errors
+                logging.warning(f"Attempting restart in {wait_time} seconds...")
                 await asyncio.sleep(wait_time)
             else:
-                logging.error("Превышено максимальное количество попыток перезапуска")
+                logging.error("Maximum restart attempts exceeded")
                 raise
 
 async def log_uptime_periodically():
-    """Периодически логирует время работы бота"""
+    """Periodically logs bot uptime"""
     while True:
         hours = (time.time() - START_TIME) // 3600
         minutes = ((time.time() - START_TIME) % 3600) // 60
-        logging.info(f"Бот работает: {int(hours)}ч {int(minutes)}мин")
-        await asyncio.sleep(1800)  # Каждые 30 минут
+        logging.info(f"Bot uptime: {int(hours)}h {int(minutes)}m")
+        await asyncio.sleep(1800)  # Every 30 minutes
 
 async def health_check_periodically(bot: Bot):
-    """Периодическая проверка состояния подключения бота"""
+    """Periodic bot connection status check"""
     while True:
         try:
-            # Проверяем состояние бота каждые 5 минут
+            # Check bot status every 5 minutes
             me = await bot.get_me()
-            logging.debug(f"Проверка состояния: бот @{me.username} активен")
+            logging.debug(f"Status check: bot @{me.username} is active")
         except Exception as e:
-            logging.error(f"Ошибка проверки состояния бота: {e}")
+            logging.error(f"Bot status check error: {e}")
         
-        await asyncio.sleep(300)  # Каждые 5 минут
+        await asyncio.sleep(300)  # Every 5 minutes
 
 async def main():
-    # Проверка наличия токена бота
+    # Check for bot token
     if not config.BOT_TOKEN:
-        logging.error("BOT_TOKEN не найден в переменных окружения")
+        logging.error("BOT_TOKEN not found in environment variables")
         raise ValueError("BOT_TOKEN environment variable is required")
     
-    # Инициализация бота с улучшенными настройками для стабильности
-    # Используем стандартную конфигурацию для совместимости с aiogram
+    # Initialize bot with improved settings for stability
+    # Using standard configuration for aiogram compatibility
     bot = Bot(
         token=config.BOT_TOKEN,
-        request_timeout=config.REQUEST_TIMEOUT  # Простой таймаут для совместимости
+        request_timeout=config.REQUEST_TIMEOUT  # Simple timeout for compatibility
     )
     dp = Dispatcher()
     
-    # Инициализация зависимостей
+    # Initialize dependencies
     db = Database()
     db.init_db()
     
@@ -154,41 +155,42 @@ async def main():
     faq_loader.load_faq()
     faq_loader.create_embeddings()
 
-    # Регистрируем middleware для внедрения зависимостей
+    # Register middleware for dependency injection
     deps_middleware = DependenciesMiddleware(
         db_instance=db,
         faq_loader_instance=faq_loader,
         config_instance=config
     )
     
-    # Примечание: AuthenticationMiddleware временно отключен, так как блокирует ввод пароля
-    # Аутентификация обрабатывается на уровне обработчиков в handlers.py
+    # Note: AuthenticationMiddleware is temporarily disabled as it blocks password input
+    # Authentication is handled at the handler level in handlers.py
     
     router.message.outer_middleware(deps_middleware)
     router.callback_query.outer_middleware(deps_middleware)
     dp.include_router(router)
+    dp.include_router(health_router)
 
-    # Запускаем фоновые задачи
+    # Start background tasks
     asyncio.create_task(log_uptime_periodically())
     asyncio.create_task(health_check_periodically(bot))
 
     try:
-        logging.info("Бот запущен и готов к работе")
+        logging.info("Bot started and ready to work")
         
-        # Запуск улучшенного polling с автоматическим переподключением
+        # Start improved polling with automatic reconnection
         await start_polling_with_retry(bot, dp, max_retries=10)
         
     except KeyboardInterrupt:
-        logging.info("Получен сигнал остановки (Остановка по клавише Ctrl+C)")
+        logging.info("Received stop signal (Ctrl+C stop)")
     except Exception as e:
-        logging.error(f"Критическая ошибка: {e}")
+        logging.error(f"Critical error: {e}")
         raise
     finally:
         try:
             await bot.session.close()
-            logging.info("Бот остановлен")
+            logging.info("Bot stopped")
         except Exception as e:
-            logging.error(f"Ошибка при закрытии сессии: {e}")
+            logging.error(f"Error closing session: {e}")
 
 if __name__ == '__main__':
     asyncio.run(main())

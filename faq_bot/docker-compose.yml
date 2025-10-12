@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  faq-bot:
+    build: .
+    container_name: faq-bot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - ADMIN_ID=${ADMIN_ID}
+      - ACCESS_PASSWORD=${ACCESS_PASSWORD}
+    volumes:
+      - ./data:/app/data
+      - ./cache:/app/cache
+      - ./files:/app/files
+      - ./logs:/app/logs
+    restart: unless-stopped
+    depends_on:
+      - redis
+      
+  redis:
+    image: redis:alpine
+    container_name: faq-bot-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

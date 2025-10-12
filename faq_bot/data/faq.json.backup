@@ -520,8 +520,7 @@
         "files": [
           "files/Сброс на заводские настройки-SN-Netum-C750 (1).pdf",
           "files/Подключение по Dongle-Netum-C750.pdf"
-        ],
-        "auto_send": true
+        ]
       }
     ],
     "metadata": {
@@ -548,8 +547,7 @@
       {
         "title": "Чек-Лист РОПа",
         "type": "file",
-        "files": ["files/Operational Checklist .pdf"],
-        "auto_send": true
+        "files": ["files/Operational Checklist .pdf"]
       }
     ],
     "metadata": {
@@ -574,8 +572,7 @@
       {
         "title": "Platinum Security",
         "type": "file",
-        "files": ["files/Platinum _ Security.pdf"],
-        "auto_send": true
+        "files": ["files/Platinum _ Security.pdf"]
       }
     ],
     "metadata": {
@@ -599,8 +596,7 @@
       {
         "title": "Trade In",
         "type": "file",
-        "files": ["files/TRADE IN.pdf"],
-        "auto_send": true
+        "files": ["files/TRADE IN.pdf"]
       }
     ],
     "metadata": {
@@ -622,8 +618,7 @@
       {
         "title": "Новые Категории",
         "type": "file",
-        "files": ["files/Новые Категории 0.3.pdf"],
-        "auto_send": true
+        "files": ["files/Новые Категории 0.3.pdf"]
       }
     ],
     "metadata": {

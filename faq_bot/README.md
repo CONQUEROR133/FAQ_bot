@@ -2,6 +2,10 @@
 
 Telegram FAQ bot with semantic search capabilities using Sentence-BERT and FAISS.
 
+## 📚 Documentation
+
+For comprehensive documentation, see [CONSOLIDATED_DOCUMENTATION.md](CONSOLIDATED_DOCUMENTATION.md)
+
 ## 🚀 Quick Start
 
 ### Simplified Setup (Recommended)
@@ -38,6 +42,18 @@ If you prefer the traditional approach:
 .\2_Stop_bot.bat
 ```
 
+### Docker Setup (Recommended for Production)
+```bash
+# Build and start the bot with Docker
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the bot
+docker-compose down
+```
+
 ## 📁 Project Structure
 
 - `src/` - Source code
@@ -47,6 +63,7 @@ If you prefer the traditional approach:
 - `logs/` - Log files (JSON format)
 - `venv/` - Python virtual environment
 - `tools/` - Utility tools
+- `tests/` - Test files
 
 ## ⚙️ Configuration
 
@@ -83,9 +100,40 @@ Run `4_Train_Model.bat` to retrain the semantic search model with your FAQ data.
 
 ## 📋 Requirements
 
-- Python 3.8+
-- Windows OS
+- Python 3.8-3.12
+- Windows or Linux OS
 - Telegram bot token
+
+## 🛠 Setup and Installation
+
+### Virtual Environment Setup
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment (Windows)
+venv\Scripts\activate
+
+# Activate virtual environment (Linux/Mac)
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Docker Setup (Production Recommended)
+
+```bash
+# Build and start services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
 
 ## 📞 Support
 

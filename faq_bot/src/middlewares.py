@@ -15,7 +15,7 @@ class DependenciesMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: dict[str, Any]
     ) -> Any:
-        # Добавляем зависимости в data
+        # Add dependencies to data
         data["db"] = self.db
         data["faq_loader"] = self.faq_loader
         data["config"] = self.config

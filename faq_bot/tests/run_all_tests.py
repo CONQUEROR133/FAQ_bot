@@ -45,7 +45,8 @@ async def main():
         "test_bot_startup.py",
         "test_faq_loading.py",
         "test_bot_handlers.py",
-        "test_faq_search.py"
+        "test_faq_search.py",
+        "test_health_check.py"
     ]
     
     # Run all tests
