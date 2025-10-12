@@ -10,6 +10,25 @@ import csv
 from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
+import shutil
+import logging
+
+def setup_logging():
+    """Setup logging for stats clearing operations"""
+    # Create logs directory if it doesn't exist
+    logs_dir = Path("logs")
+    logs_dir.mkdir(exist_ok=True)
+    
+    # Setup logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(logs_dir / "stats_clear.log"),
+            logging.StreamHandler()
+        ]
+    )
+    return logging.getLogger(__name__)
 
 def parse_log_file(log_file_path):
     """
@@ -134,6 +153,88 @@ def export_to_csv(log_entries, output_file):
     else:
         print("Error: Could not export CSV with any encoding")
 
+def clear_stats(log_file_path, archive=True):
+    """
+    Clear statistics by deleting or archiving log files.
+    
+    Args:
+        log_file_path (str): Path to the main log file
+        archive (bool): Whether to archive files instead of deleting them
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    logger = setup_logging()
+    
+    # Try multiple paths to find the logs directory, prioritizing the project directory
+    project_dir = Path(__file__).parent.parent
+    possible_paths = [
+        project_dir / log_file_path,  # Project directory (priority)
+        Path(log_file_path),  # Relative to current directory
+        Path.cwd() / log_file_path,  # Current working directory
+    ]
+    
+    log_path = None
+    logs_dir = None
+    
+    for path in possible_paths:
+        if path.parent.exists():
+            log_path = path
+            logs_dir = path.parent
+            break
+    
+    if log_path is None or logs_dir is None:
+        print(f"Error: Could not find logs directory")
+        logger.error(f"Could not find logs directory")
+        return False
+    
+    # Create archive directory if archiving
+    archive_dir = None
+    if archive:
+        archive_dir = logs_dir / "archive" / datetime.now().strftime("%Y%m%d_%H%M%S")
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Created archive directory: {archive_dir}")
+    
+    cleared_files = []
+    
+    # Find all log files (main log and backups)
+    log_files = list(logs_dir.glob("bot.log*"))
+    
+    if not log_files:
+        print("No log files found to clear")
+        logger.info("No log files found to clear")
+        return True
+    
+    # Process each log file
+    for log_file in log_files:
+        try:
+            if archive and archive_dir:
+                # Archive the file
+                destination = archive_dir / log_file.name
+                shutil.move(str(log_file), str(destination))
+                cleared_files.append(f"Archived: {log_file.name}")
+                logger.info(f"Archived {log_file.name} to {destination}")
+            else:
+                # Delete the file
+                log_file.unlink()
+                cleared_files.append(f"Deleted: {log_file.name}")
+                logger.info(f"Deleted {log_file.name}")
+        except Exception as e:
+            error_msg = f"Error processing {log_file.name}: {e}"
+            print(f"Error: {error_msg}")
+            logger.error(error_msg)
+            return False
+    
+    # Summary
+    print(f"\nStatistics cleared successfully!")
+    if archive:
+        print(f"Files archived to: {archive_dir}")
+    for file_info in cleared_files:
+        print(f"  - {file_info}")
+    
+    logger.info(f"Statistics cleared. Files processed: {len(cleared_files)}")
+    return True
+
 def main():
     parser = argparse.ArgumentParser(description="Aggregate and analyze bot statistics from JSON log files")
     parser.add_argument('--log-file', '-l', 
@@ -148,8 +249,22 @@ def main():
     parser.add_argument('--csv-only', 
                         action='store_true',
                         help='Only export to CSV, do not display statistics')
+    parser.add_argument('--clear-stats', 
+                        action='store_true',
+                        help='Clear all statistics by archiving log files')
     
     args = parser.parse_args()
+    
+    # Handle stats clearing
+    if args.clear_stats:
+        print("Clearing statistics...")
+        # Use the default log file path
+        success = clear_stats('logs/bot.log')
+        if success:
+            print("Statistics cleared successfully!")
+        else:
+            print("Error clearing statistics!")
+        return
     
     # Resolve log file path
     log_file_path = Path(args.log_file).resolve()
@@ -161,7 +276,8 @@ def main():
         log_file_path = (script_dir.parent / args.log_file).resolve()
         
         if not log_file_path.exists():
-            print(f"Error: Log file not found: {args.log_file}")
+            print(f"⚠️  Warning: Log file not found: {args.log_file}")
+            print("📊 No statistics available yet. The bot may not have processed any requests.")
             return
     
     print(f"Parsing log file: {log_file_path}")
@@ -170,7 +286,7 @@ def main():
     log_entries = parse_log_file(log_file_path)
     
     if not log_entries:
-        print("No log entries found")
+        print("📊 No log entries found. Statistics will be available after the bot processes requests.")
         return
     
     print(f"Found {len(log_entries)} log entries")
@@ -204,3 +320,19 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

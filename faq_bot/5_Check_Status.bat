@@ -154,6 +154,33 @@ if !ERRORLEVEL! NEQ 0 (
     echo ✅ Все файлы из faq.json найдены
 )
 
+:: Проверка логов
+echo.
+echo 🔧 Проверка логов...
+
+if exist logs (
+    echo ✅ Директория logs найдена
+    
+    :: Проверка основного лог-файла
+    if exist logs\bot.log (
+        for /f "tokens=*" %%i in ('dir logs\bot.log /a-d ^| findstr /r /c:"^[0-9]"') do set LOG_SIZE=%%i
+        echo Основной лог-файл: !LOG_SIZE! байт
+    ) else (
+        echo Основной лог-файл: не найден
+    )
+    
+    :: Подсчет архивных логов
+    set ARCHIVE_COUNT=0
+    if exist logs\archive (
+        for /f "tokens=*" %%i in ('dir logs\archive /b /a-d ^| find /c /v ""') do set ARCHIVE_COUNT=%%i
+        echo Архивные логи: !ARCHIVE_COUNT! директорий
+    ) else (
+        echo Архивные логи: нет
+    )
+) else (
+    echo ⚠️ Директория logs не найдена
+)
+
 :: Информация о системе
 echo.
 echo 🔧 Информация о системе...

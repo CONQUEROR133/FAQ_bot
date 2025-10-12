@@ -1014,6 +1014,103 @@ async def auth_users_handler(
         logging.error(f"Error getting user list: {str(e)}")
         await message.answer("⚠ An error occurred while getting the user list.")
 
+@router.message(Command("clear_stats"))
+async def clear_stats_handler(
+    message: Message, 
+    db,
+    config
+):
+    """Command to clear statistics (admin only)"""
+    if not message.from_user or message.from_user.id != config.ADMIN_ID:
+        await message.answer("⛔ You don't have permission to execute this command.")
+        return
+    
+    # Create confirmation keyboard
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="✅ Confirm", callback_data="clear_stats_confirm")],
+        [InlineKeyboardButton(text="❌ Cancel", callback_data="clear_stats_cancel")]
+    ])
+    
+    await message.answer(
+        "⚠️ <b>Clear Statistics</b>\n\n"
+        "This will archive all log files and start fresh statistics.\n"
+        "Are you sure you want to proceed?",
+        parse_mode='HTML',
+        reply_markup=keyboard
+    )
+
+@router.callback_query(F.data == "clear_stats_confirm")
+async def clear_stats_confirm_callback(callback: CallbackQuery, db, config):
+    """Callback handler for confirming stats clearing"""
+    # Check authentication
+    if not callback.from_user or callback.from_user.id != config.ADMIN_ID:
+        await callback.answer("⛔ You don't have permission to execute this command.", show_alert=True)
+        return
+    
+    try:
+        # Archive log files
+        from pathlib import Path
+        import shutil
+        from datetime import datetime
+        
+        # Setup logging for stats clearing
+        logs_dir = Path("logs")
+        if not logs_dir.exists():
+            await callback.answer("❌ Logs directory not found", show_alert=True)
+            return
+        
+        # Create archive directory
+        archive_dir = logs_dir / "archive" / datetime.now().strftime("%Y%m%d_%H%M%S")
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Find all log files (main log and backups)
+        log_files = list(logs_dir.glob("bot.log*"))
+        
+        if not log_files:
+            await callback.message.edit_text("✅ No log files found to clear. Statistics are already clean!")
+            await callback.answer("No log files found")
+            return
+        
+        # Archive each log file
+        archived_files = []
+        for log_file in log_files:
+            try:
+                destination = archive_dir / log_file.name
+                shutil.move(str(log_file), str(destination))
+                archived_files.append(log_file.name)
+            except Exception as e:
+                logging.error(f"Error archiving {log_file.name}: {e}")
+        
+        # Update message with success information
+        success_message = (
+            "✅ <b>Statistics Cleared Successfully!</b>\n\n"
+            f"Archived {len(archived_files)} log files to:\n"
+            f"<code>{archive_dir.relative_to(logs_dir.parent)}</code>\n\n"
+            "New statistics will start from now."
+        )
+        
+        await callback.message.edit_text(success_message, parse_mode='HTML')
+        await callback.answer("Statistics cleared successfully!")
+        
+        # Log the action
+        logging.info(f"Statistics cleared by user {callback.from_user.id}. Archived {len(archived_files)} files to {archive_dir}")
+        
+    except Exception as e:
+        logging.error(f"Error clearing statistics: {str(e)}")
+        await callback.message.edit_text("❌ An error occurred while clearing statistics. Please check the logs.")
+        await callback.answer("Error clearing statistics", show_alert=True)
+
+@router.callback_query(F.data == "clear_stats_cancel")
+async def clear_stats_cancel_callback(callback: CallbackQuery, db, config):
+    """Callback handler for canceling stats clearing"""
+    # Check authentication
+    if not callback.from_user or callback.from_user.id != config.ADMIN_ID:
+        await callback.answer("⛔ You don't have permission to execute this command.", show_alert=True)
+        return
+    
+    await callback.message.edit_text("❌ Statistics clearing cancelled.")
+    await callback.answer("Cancelled")
+
 # Handler for special "TV Summary" request
 @router.message(F.text.func(lambda text: text and "сводная" in text.lower() and "тв" in text.lower()))
 async def tv_summary_handler(

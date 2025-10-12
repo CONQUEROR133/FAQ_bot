@@ -97,6 +97,19 @@ Run `4_Train_Model.bat` to retrain the semantic search model with your FAQ data.
 - `3_Clean_All.bat` - Clean cache and logs
 - `4_Train_Model.bat` - Train semantic search model
 - `5_Check_Status.bat` - Check system status
+- `6_Clear_Stats.bat` - Clear bot statistics
+
+### Docker Setup (Recommended for Production)
+```bash
+# Build and start the bot with Docker
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the bot
+docker-compose down
+```
 
 ## 📋 Requirements
 
@@ -174,6 +187,45 @@ After starting the bot:
 2. Send the `/start` command
 3. Enter the access password when prompted
 4. Ask a question to test the FAQ functionality
+
+## 📊 Statistics and Analytics
+
+The bot tracks usage statistics in JSON log format. You can analyze these logs using the provided utility:
+
+```cmd
+python tools/aggregate_stats.py
+```
+
+This will show:
+- Total requests
+- Top queries by count
+- Option to export to CSV
+
+### Clearing Statistics
+
+To start fresh with statistics:
+
+**Via Command Line:**
+```cmd
+python tools/aggregate_stats.py --clear-stats
+```
+
+**Via Batch Script:**
+```cmd
+6_Clear_Stats.bat
+```
+
+**Via Telegram (Admin only):**
+Send `/clear_stats` command to the bot and confirm when prompted.
+
+All log files will be archived to `logs/archive/timestamp/` when statistics are cleared.
+
+### Troubleshooting
+
+If statistics are not clearing:
+- Check logs/ permissions
+- Check stats_clear.log for error messages
+- Ensure no processes are locking the log files
 
 ## 📄 FAQ Data Format
 
