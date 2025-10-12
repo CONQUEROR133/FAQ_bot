@@ -327,7 +327,7 @@ async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_lo
             return
         
         # Find entry by year
-        target_query = f"TV Summary Table {year}"
+        target_query = f"Сводная таблица ТВ {year}"
         target_index = None
         
         for i, item in enumerate(faq_loader.faq):
@@ -337,6 +337,7 @@ async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_lo
         
         if target_index is None:
             await callback.answer("❌ Entry not found")
+            logging.error(f"Entry not found for query: {target_query}")
             return
         
         match = faq_loader.faq[target_index]
@@ -352,30 +353,47 @@ async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_lo
                 if files:
                     file_path = files[0]  # Take first file
                     
-                    if os.path.exists(file_path):
-                        # Check file size
-                        try:
-                            file_size = os.path.getsize(file_path)
-                            if file_size > 50 * 1024 * 1024:  # 50MB
-                                await callback.answer("❌ File too large")
-                                return
-                        except OSError as e:
-                            logging.error(f"Error checking file size: {e}")
-                            await callback.answer("❌ File access error")
-                            return
-                        
-                        # Send file
-                        try:
-                            await send_file_with_retry(callback.message, file_path)
-                            await callback.answer("✅ File sent")
-                            logging.info(f"Successfully sent file: {file_path}")
-                        except Exception as send_error:
-                            logging.error(f"Error sending file: {send_error}")
-                            await callback.answer("❌ Error sending file")
-                            return
-                    else:
-                        await callback.answer("❌ File not found")
+                    # Check if file exists before attempting to send
+                    if not os.path.exists(file_path):
+                        error_msg = f"❌ File not found: {file_path}. Please contact the administrator."
+                        await callback.answer(error_msg)
+                        logging.error(f"File not found: {file_path} for query: {target_query}")
+                        await callback.message.answer("Sorry, the file for 'Сводное 2025 года' is not available. Contact the admin.")
                         return
+                    
+                    # Check file size
+                    try:
+                        file_size = os.path.getsize(file_path)
+                        if file_size > 50 * 1024 * 1024:  # 50MB
+                            await callback.answer("❌ File too large")
+                            return
+                    except OSError as e:
+                        logging.error(f"Error checking file size: {e}")
+                        await callback.answer("❌ File access error")
+                        return
+                    
+                    # Send file
+                    try:
+                        await send_file_with_retry(callback.message, file_path)
+                        await callback.answer("✅ File sent")
+                        logging.info(f"Successfully sent file: {file_path}")
+                    except Exception as send_error:
+                        logging.error(f"Error sending file: {send_error}")
+                        await callback.answer("❌ Error sending file. Please try again later.")
+                        await callback.message.answer("Sorry, there was an error sending the file. Please try again later.")
+                        return
+                else:
+                    await callback.answer("❌ No files found for this resource")
+                    logging.warning(f"No files found for resource in query: {target_query}")
+                    return
+            else:
+                await callback.answer("❌ Invalid resource type")
+                logging.warning(f"Invalid resource type for query: {target_query}")
+                return
+        else:
+            await callback.answer("❌ No resources found")
+            logging.warning(f"No resources found for query: {target_query}")
+            return
         
         # Remove keyboard
         await remove_keyboard(callback.message)
@@ -419,7 +437,7 @@ async def soundbar_year_selection_callback(callback: CallbackQuery, db, config, 
             return
         
         # Find entry by year
-        target_query = f"Soundbar Summary {year}"
+        target_query = f"Сводная саундбар {year}"
         target_index = None
         
         for i, item in enumerate(faq_loader.faq):
@@ -429,6 +447,7 @@ async def soundbar_year_selection_callback(callback: CallbackQuery, db, config, 
         
         if target_index is None:
             await callback.answer("❌ Entry not found")
+            logging.error(f"Entry not found for query: {target_query}")
             return
         
         match = faq_loader.faq[target_index]
@@ -444,30 +463,47 @@ async def soundbar_year_selection_callback(callback: CallbackQuery, db, config, 
                 if files:
                     file_path = files[0]  # Take first file
                     
-                    if os.path.exists(file_path):
-                        # Check file size
-                        try:
-                            file_size = os.path.getsize(file_path)
-                            if file_size > 50 * 1024 * 1024:  # 50MB
-                                await callback.answer("❌ File too large")
-                                return
-                        except OSError as e:
-                            logging.error(f"Error checking file size: {e}")
-                            await callback.answer("❌ File access error")
-                            return
-                        
-                        # Send file
-                        try:
-                            await send_file_with_retry(callback.message, file_path)
-                            await callback.answer("✅ File sent")
-                            logging.info(f"Successfully sent file: {file_path}")
-                        except Exception as send_error:
-                            logging.error(f"Error sending file: {send_error}")
-                            await callback.answer("❌ Error sending file")
-                            return
-                    else:
-                        await callback.answer("❌ File not found")
+                    # Check if file exists before attempting to send
+                    if not os.path.exists(file_path):
+                        error_msg = f"❌ File not found: {file_path}. Please contact the administrator."
+                        await callback.answer(error_msg)
+                        logging.error(f"File not found: {file_path} for query: {target_query}")
+                        await callback.message.answer("Sorry, the file is not available. Contact the admin.")
                         return
+                    
+                    # Check file size
+                    try:
+                        file_size = os.path.getsize(file_path)
+                        if file_size > 50 * 1024 * 1024:  # 50MB
+                            await callback.answer("❌ File too large")
+                            return
+                    except OSError as e:
+                        logging.error(f"Error checking file size: {e}")
+                        await callback.answer("❌ File access error")
+                        return
+                    
+                    # Send file
+                    try:
+                        await send_file_with_retry(callback.message, file_path)
+                        await callback.answer("✅ File sent")
+                        logging.info(f"Successfully sent file: {file_path}")
+                    except Exception as send_error:
+                        logging.error(f"Error sending file: {send_error}")
+                        await callback.answer("❌ Error sending file")
+                        await callback.message.answer("Sorry, there was an error sending the file. Please try again later.")
+                        return
+                else:
+                    await callback.answer("❌ No files found for this resource")
+                    logging.warning(f"No files found for resource in query: {target_query}")
+                    return
+            else:
+                await callback.answer("❌ Invalid resource type")
+                logging.warning(f"Invalid resource type for query: {target_query}")
+                return
+        else:
+            await callback.answer("❌ No resources found")
+            logging.warning(f"No resources found for query: {target_query}")
+            return
         
         # Remove keyboard
         await remove_keyboard(callback.message)

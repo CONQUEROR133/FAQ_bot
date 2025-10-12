@@ -211,6 +211,29 @@ The bot uses a JSON file (`data/faq.json`) to store FAQ entries. Here's an examp
 ]
 ```
 
+## 🛠 Troubleshooting
+
+### File Not Found Errors
+
+If you encounter "file not found" errors when trying to access files through the bot:
+
+1. **Verify file paths in faq.json**: Ensure all `file_path` entries point to existing files in the `files/` directory
+2. **Check file permissions**: Make sure the bot has read access to all files in the `files/` directory
+3. **Validate with status check**: Run `5_Check_Status.bat` to verify all files are present
+
+Example validation command:
+```cmd
+python tests/test_file_validation.py
+```
+
+This will check all file paths in `data/faq.json` and report any missing files.
+
+### Common Issues
+
+1. **Files not sending**: Check that file paths in `faq.json` match actual files in the `files/` directory
+2. **Authentication issues**: Verify `ADMIN_ID` and `ACCESS_PASSWORD` in `.env` file
+3. **Model not found**: Run `4_Train_Model.bat` to create the semantic search model
+
 ## 🧹 Maintenance
 
 ### Log Rotation

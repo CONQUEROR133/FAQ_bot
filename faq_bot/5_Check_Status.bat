@@ -127,6 +127,33 @@ if exist cache\faq_index.faiss (
     echo Запустите 4_Train_Model.bat для создания
 )
 
+:: Проверка файлов FAQ
+echo.
+echo 🔧 Проверка файлов FAQ...
+
+if exist files (
+    echo ✅ Директория files найдена
+    
+    :: Подсчет файлов
+    set FILE_COUNT=0
+    for /f "tokens=*" %%i in ('dir files /b /a-d ^| find /c /v ""') do set FILE_COUNT=%%i
+    echo Файлов в директории files: !FILE_COUNT!
+) else (
+    echo ⚠️ Директория files не найдена
+)
+
+:: Проверка соответствия файлов faq.json
+echo.
+echo 🔧 Проверка соответствия файлов в faq.json...
+
+python -c "import sys; sys.path.insert(0, 'src'); from utils import validate_faq_files; missing, valid = validate_faq_files('data/faq.json'); print(f'Valid files: {len(valid)}'); print(f'Missing files: {len(missing)}'); sys.exit(1 if missing else 0)" >nul 2>&1
+if !ERRORLEVEL! NEQ 0 (
+    echo ⚠️ Найдены отсутствующие файлы в faq.json
+    echo Запустите python tests/test_file_validation.py для получения деталей
+) else (
+    echo ✅ Все файлы из faq.json найдены
+)
+
 :: Информация о системе
 echo.
 echo 🔧 Информация о системе...

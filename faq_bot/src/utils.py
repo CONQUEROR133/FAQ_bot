@@ -1,6 +1,7 @@
 import logging
 import os
 import asyncio
+import json
 from aiogram import types
 from aiogram.exceptions import TelegramRetryAfter, TelegramNetworkError
 
@@ -60,3 +61,50 @@ def send_callback_answer(callback, text, show_alert=False):
     except Exception as e:
         logging.warning(f"Could not send callback answer: {e}")
         return None
+
+def validate_faq_files(faq_file_path):
+    """Validate that all file paths in faq.json exist"""
+    missing_files = []
+    valid_entries = []
+    
+    try:
+        with open(faq_file_path, 'r', encoding='utf-8') as f:
+            faq_data = json.load(f)
+        
+        # Get the base directory for relative paths
+        base_dir = os.path.dirname(faq_file_path)
+        project_root = os.path.dirname(base_dir)  # This should be the project root
+        
+        for entry in faq_data:
+            if 'resources' in entry:
+                for resource in entry['resources']:
+                    if resource.get('type') == 'file':
+                        files = resource.get('files', [])
+                        for file_path in files:
+                            # Check if it's an absolute path or relative path
+                            if os.path.isabs(file_path):
+                                full_path = file_path
+                            else:
+                                # For relative paths, join with project root
+                                full_path = os.path.join(project_root, file_path)
+                            
+                            if not os.path.exists(full_path):
+                                missing_files.append({
+                                    'query': entry.get('query', 'Unknown'),
+                                    'file_path': file_path,
+                                    'full_path': full_path
+                                })
+                                logging.warning(f"Missing file: {full_path} for query: {entry.get('query', 'Unknown')}")
+                            else:
+                                valid_entries.append({
+                                    'query': entry.get('query', 'Unknown'),
+                                    'file_path': file_path,
+                                    'full_path': full_path
+                                })
+                                logging.info(f"Valid file: {full_path} for query: {entry.get('query', 'Unknown')}")
+    
+    except Exception as e:
+        logging.error(f"Error validating FAQ files: {e}")
+        return [], []
+    
+    return missing_files, valid_entries
