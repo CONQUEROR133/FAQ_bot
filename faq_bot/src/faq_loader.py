@@ -76,6 +76,7 @@ class FAQLoader:
         # Performance tracking
         self.loading_stats: Optional[LoadingStats] = None
         self._model_loaded = False
+        self._last_search_cached = False
         
         # Register with performance manager for tracking
         performance_manager.register_object(self)
@@ -389,15 +390,21 @@ class FAQLoader:
                 logger.error("Query cannot be empty after stripping")
                 return None, None
             
-            # Check cache first
-            cache_key = f"{query}:{k}:{threshold}"
+            # Check for cached result first
+            cache_key = f"{query}_{k}_{threshold}"
             cached_result = performance_manager.get_cached_query_result(cache_key)
+            
             if cached_result is not None:
-                logger.debug(f"Cache hit for query: {query[:50]}...")
+                logger.debug(f"Using cached result for: {query[:50]}...")
+                # Set flag to indicate this was a cache hit
+                self._last_search_cached = True
                 return cached_result
             
+            # If we get here, it's not a cache hit
+            self._last_search_cached = False
+            
             if not self.index:
-                logger.error("Index not initialized. Call create_embeddings() first.")
+                logger.error("FAISS index not loaded. Call create_embeddings() first.")
                 return None, None
                 
             if not self.faq:

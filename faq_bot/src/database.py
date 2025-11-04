@@ -33,6 +33,14 @@ class QueryStats:
     bad_words_count: int
     authenticated_users_count: int
     popular_queries: List[Tuple[str, int]]
+    avg_response_time: float = 0.0
+    cache_hit_rate: float = 0.0
+    avg_query_length: float = 0.0
+    similarity_score_distribution: Dict[str, int] = None
+    
+    def __post_init__(self):
+        if self.similarity_score_distribution is None:
+            self.similarity_score_distribution = {}
 
 
 @dataclass
@@ -137,9 +145,24 @@ class Database:
                     success INTEGER DEFAULT 0,
                     similarity_score REAL,
                     response_time_ms INTEGER,
+                    cache_hit INTEGER DEFAULT 0,
+                    query_length INTEGER,
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
                 ''')
+                
+                # Add new columns if they don't exist (for existing databases)
+                try:
+                    cursor.execute('ALTER TABLE query_stats ADD COLUMN cache_hit INTEGER DEFAULT 0')
+                except sqlite3.OperationalError:
+                    # Column already exists
+                    pass
+                
+                try:
+                    cursor.execute('ALTER TABLE query_stats ADD COLUMN query_length INTEGER')
+                except sqlite3.OperationalError:
+                    # Column already exists
+                    pass
                 
                 # Bad words log with severity levels
                 cursor.execute('''
@@ -198,7 +221,8 @@ class Database:
             return False
     
     def log_query(self, question: str, success: bool, user_id: Optional[int] = None, 
-                  similarity_score: Optional[float] = None, response_time_ms: Optional[int] = None) -> bool:
+                  similarity_score: Optional[float] = None, response_time_ms: Optional[int] = None,
+                  cache_hit: bool = False, query_length: Optional[int] = None) -> bool:
         """Log a query with enhanced metrics.
         
         Args:
@@ -207,6 +231,8 @@ class Database:
             user_id: Optional user ID
             similarity_score: Optional similarity score
             response_time_ms: Optional response time in milliseconds
+            cache_hit: Whether the result was served from cache
+            query_length: Length of the query text
             
         Returns:
             bool: True if logged successfully, False otherwise
@@ -219,10 +245,11 @@ class Database:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute(
-                    "INSERT INTO query_stats (question, user_id, success, similarity_score, response_time_ms) VALUES (?, ?, ?, ?, ?)",
-                    (question.strip(), user_id, 1 if success else 0, similarity_score, response_time_ms)
+                    "INSERT INTO query_stats (question, user_id, success, similarity_score, response_time_ms, cache_hit, query_length) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (question.strip(), user_id, 1 if success else 0, similarity_score, response_time_ms, 1 if cache_hit else 0, query_length)
                 )
                 conn.commit()
+                logger.info(f"Logged query: {question[:50]}... (success: {success}, similarity: {similarity_score}, cache: {cache_hit})")
                 return True
                 
         except Exception as e:
@@ -300,13 +327,51 @@ class Database:
                 # Calculate success rate
                 success_rate = (success_queries / total_queries * 100) if total_queries > 0 else 0
                 
+                # Get average response time
+                cursor.execute("SELECT AVG(response_time_ms) FROM query_stats WHERE response_time_ms IS NOT NULL")
+                avg_response_time = cursor.fetchone()[0] or 0.0
+                
+                # Get cache hit rate
+                cursor.execute("SELECT COUNT(*) FROM query_stats WHERE cache_hit = 1")
+                cache_hits = cursor.fetchone()[0] or 0
+                cache_hit_rate = (cache_hits / total_queries * 100) if total_queries > 0 else 0
+                
+                # Get average query length
+                cursor.execute("SELECT AVG(query_length) FROM query_stats WHERE query_length IS NOT NULL")
+                avg_query_length = cursor.fetchone()[0] or 0.0
+                
+                # Get similarity score distribution
+                cursor.execute("""
+                    SELECT 
+                        CASE 
+                            WHEN similarity_score >= 0.9 THEN '0.9-1.0'
+                            WHEN similarity_score >= 0.8 THEN '0.8-0.9'
+                            WHEN similarity_score >= 0.7 THEN '0.7-0.8'
+                            WHEN similarity_score >= 0.6 THEN '0.6-0.7'
+                            WHEN similarity_score >= 0.5 THEN '0.5-0.6'
+                            ELSE '<0.5'
+                        END as range,
+                        COUNT(*) as count
+                    FROM query_stats 
+                    WHERE similarity_score IS NOT NULL
+                    GROUP BY range
+                    ORDER BY range DESC
+                """)
+                similarity_distribution = {}
+                for row in cursor.fetchall() or []:
+                    similarity_distribution[row[0]] = row[1]
+                
                 return QueryStats(
                     total_queries=total_queries,
                     success_rate=success_rate,
                     unanswered_questions=unanswered_questions,
                     bad_words_count=bad_words_count,
                     authenticated_users_count=authenticated_users_count,
-                    popular_queries=[(row[0], row[1]) for row in popular_queries]
+                    popular_queries=[(row[0], row[1]) for row in popular_queries],
+                    avg_response_time=avg_response_time,
+                    cache_hit_rate=cache_hit_rate,
+                    avg_query_length=avg_query_length,
+                    similarity_score_distribution=similarity_distribution
                 )
                 
         except Exception as e:
@@ -318,7 +383,11 @@ class Database:
                 unanswered_questions=0,
                 bad_words_count=0,
                 authenticated_users_count=0,
-                popular_queries=[]
+                popular_queries=[],
+                avg_response_time=0.0,
+                cache_hit_rate=0.0,
+                avg_query_length=0.0,
+                similarity_score_distribution={}
             )
     
     def export_stats_to_file(self, include_sensitive: bool = False) -> Optional[str]:
@@ -345,7 +414,17 @@ class Database:
                     f.write(f"Успешных ответов: {stats.success_rate:.2f}%\n")
                     f.write(f"Неотвеченных вопросов: {stats.unanswered_questions}\n")
                     f.write(f"Зафиксировано матов: {stats.bad_words_count}\n")
-                    f.write(f"Аутентифицированных пользователей: {stats.authenticated_users_count}\n\n")
+                    f.write(f"Аутентифицированных пользователей: {stats.authenticated_users_count}\n")
+                    f.write(f"Среднее время ответа: {stats.avg_response_time:.2f} мс\n")
+                    f.write(f"Процент кэшированных ответов: {stats.cache_hit_rate:.2f}%\n")
+                    f.write(f"Средняя длина запроса: {stats.avg_query_length:.2f} символов\n\n")
+                    
+                    # Write similarity score distribution
+                    f.write("=== РАСПРЕДЕЛЕНИЕ ПО СХОЖЕСТИ ===\n")
+                    for range_name, count in sorted(stats.similarity_score_distribution.items(), 
+                                                   key=lambda x: x[0], reverse=True):
+                        f.write(f"{range_name}: {count} запросов\n")
+                    f.write("\n")
                     
                     # Write popular queries
                     f.write("=== ТОП-10 ПОПУЛЯРНЫХ ЗАПРОСОВ ===\n")
@@ -598,4 +677,38 @@ class Database:
                 
         except Exception as e:
             logger.error(f"Failed to cleanup old data: {e}")
+            return False
+
+    def clear_all_stats(self) -> bool:
+        """Clear all statistics data from all tables.
+        
+        Returns:
+            bool: True if clearing successful
+        """
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Clear all data from statistics tables
+                cursor.execute("DELETE FROM query_stats")
+                query_deleted = cursor.rowcount
+                
+                cursor.execute("DELETE FROM bad_words_log")
+                bad_words_deleted = cursor.rowcount
+                
+                cursor.execute("DELETE FROM unanswered_questions")
+                unanswered_deleted = cursor.rowcount
+                
+                # Note: We don't clear authenticated_users as that's user management data
+                
+                conn.commit()
+                
+                logger.info(
+                    f"All statistics cleared: {query_deleted} query stats, "
+                    f"{bad_words_deleted} bad words logs, {unanswered_deleted} unanswered questions deleted"
+                )
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to clear all statistics: {e}")
             return False

@@ -1,8 +1,38 @@
-# Python
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
+*.pyd
+.Python
 *.so
+
+# Cache files
+cache/
+
+# Environment variables
+.env
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -19,36 +49,35 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Virtual Environment
-venv/
-env/
-ENV/
+# PyInstaller
+*.manifest
+*.spec
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# Jupyter Notebook
+.ipynb_checkpoints
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Application specific
-bot.log
-logs/
+# Database
 *.db
-faq_embeddings.pkl
-faq_index.faiss
-cache/
+*.db3
+*.sqlite
+*.sqlite3
 
-# Environment variables
-.env
+# Coverage
+.coverage
+htmlcov/
+.coverage.*
+.cache
 
-# Temporary files
-temp/
-tmp/
-*.tmp
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Backup files
 *.bak
+*.backup
+*.old
+*.orig
+*~

@@ -25,4 +25,4 @@ EXPOSE 8080
 RUN mkdir -p cache data files logs
 
 # Run the bot
-CMD ["python", "run_bot.py"]
+CMD ["python", "src/main.py"]

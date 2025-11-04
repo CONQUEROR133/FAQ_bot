@@ -1376,6 +1376,10 @@ async def message_handler(
     chat_id = message.chat.id if message.chat else None
     message_id = message.message_id
     
+    # Record start time for response time measurement
+    import time
+    start_time = time.time()
+    
     # Custom logging with required fields
     import logging
     logging.getLogger().info(
@@ -1384,7 +1388,8 @@ async def message_handler(
             'user_id': user_id,
             'chat_id': chat_id,
             'message_id': message_id,
-            'handler': 'message_handler'
+            'handler': 'message_handler',
+            'query_length': len(text)
         }
     )
     
@@ -1429,16 +1434,22 @@ async def message_handler(
     # Search for answer in FAQ
     distances, indices = faq_loader.search(text, threshold=config.SIMILARITY_THRESHOLD)
     
+    # Calculate response time
+    response_time = int((time.time() - start_time) * 1000)  # Convert to milliseconds
+    
     if not distances or not indices:
         logging.info(f"No matches found for query: '{text}'")
         await message.answer("Did not find a suitable answer. Specify your query.")
-        db.log_query(text, success=False)
-        db.log_unanswered_question(text)
+        db.log_query(text, success=False, user_id=user_id, query_length=len(text), response_time_ms=response_time)
+        db.log_unanswered_question(text, user_id)
         return
 
     similarity = distances[0]
     index = indices[0]
     match = faq_loader.faq[index]
+    
+    # Check if result is from cache
+    is_cache_hit = getattr(faq_loader, '_last_search_cached', False)
     
     # Send main answer
     await message.answer(match['response'])
@@ -1460,6 +1471,25 @@ async def message_handler(
             keyboard = create_resource_selection_keyboard(match, index)
             await message.answer("👆 Select the required resource:", reply_markup=keyboard)
     
-    # Log result
-    db.log_query(text, success=True)
-
+    # Log result with detailed metrics
+    db.log_query(
+        text, 
+        success=True, 
+        user_id=user_id,
+        similarity_score=float(similarity),
+        response_time_ms=response_time,
+        cache_hit=is_cache_hit,
+        query_length=len(text)
+    )
+    
+    # Detailed logging for analytics
+    logging.getLogger().info(
+        f"Query processed successfully: {text[:50]}...",
+        extra={
+            'user_id': user_id,
+            'query_similarity': float(similarity),
+            'response_time': response_time,
+            'cache_hit': is_cache_hit,
+            'handler': 'message_handler_result'
+        }
+    )

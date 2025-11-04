@@ -3,7 +3,6 @@
 Basic bot startup test to verify core functionality
 """
 
-import asyncio
 import sys
 import os
 import pytest
@@ -11,8 +10,7 @@ import pytest
 # Add the src directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-@pytest.mark.asyncio
-async def test_bot_initialization():
+def test_bot_initialization():
     """Test if bot can be initialized without errors"""
     print("🔍 Testing bot initialization...")
     
@@ -26,20 +24,18 @@ async def test_bot_initialization():
         
         # Test bot initialization
         bot = Bot(
-            token=config.BOT_TOKEN,
-            default_request_timeout=config.REQUEST_TIMEOUT
+            token=config.BOT_TOKEN
         )
         
         print("✅ Bot initialized successfully")
-        await bot.session.close()
+        # Note: We're not actually connecting to Telegram, just testing initialization
         assert True
         
     except Exception as e:
         print(f"❌ Bot initialization failed: {e}")
         pytest.fail(f"Bot initialization failed: {e}")
 
-@pytest.mark.asyncio
-async def test_config_loading():
+def test_config_loading():
     """Test if configuration loads correctly"""
     print("🔍 Testing configuration loading...")
     
@@ -65,8 +61,7 @@ async def test_config_loading():
         print(f"❌ Configuration loading failed: {e}")
         pytest.fail(f"Configuration loading failed: {e}")
 
-@pytest.mark.asyncio
-async def test_database_connection():
+def test_database_connection():
     """Test database connection and initialization"""
     print("🔍 Testing database connection...")
     

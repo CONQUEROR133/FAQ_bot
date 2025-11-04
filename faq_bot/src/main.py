@@ -21,7 +21,10 @@ class JSONFormatter(logging.Formatter):
             "ts": self.formatTime(record, self.datefmt),
             "level": record.levelname,
             "logger": record.name,
-            "message": record.getMessage()
+            "message": record.getMessage(),
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno
         }
         
         # Add extra fields if present
@@ -33,6 +36,12 @@ class JSONFormatter(logging.Formatter):
             log_entry["message_id"] = record.message_id
         if hasattr(record, 'handler'):
             log_entry["handler"] = record.handler
+        if hasattr(record, 'query_similarity'):
+            log_entry["query_similarity"] = record.query_similarity
+        if hasattr(record, 'response_time'):
+            log_entry["response_time"] = record.response_time
+        if hasattr(record, 'cache_hit'):
+            log_entry["cache_hit"] = record.cache_hit
             
         return json.dumps(log_entry, ensure_ascii=False)
 

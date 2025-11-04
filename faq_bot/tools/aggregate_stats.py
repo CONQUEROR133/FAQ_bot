@@ -108,6 +108,118 @@ def get_top_queries(log_entries, top_n=20):
     
     return query_counter.most_common(top_n)
 
+def get_response_time_stats(log_entries):
+    """
+    Get response time statistics.
+    
+    Args:
+        log_entries (list): List of log entries
+        
+    Returns:
+        dict: Dictionary with response time statistics
+    """
+    response_times = []
+    
+    for entry in log_entries:
+        if entry.get('handler') == 'message_handler_result' and 'response_time' in entry:
+            response_times.append(entry['response_time'])
+    
+    if not response_times:
+        return {}
+    
+    return {
+        'count': len(response_times),
+        'avg': sum(response_times) / len(response_times),
+        'min': min(response_times),
+        'max': max(response_times),
+        'median': sorted(response_times)[len(response_times) // 2]
+    }
+
+def get_cache_hit_stats(log_entries):
+    """
+    Get cache hit statistics.
+    
+    Args:
+        log_entries (list): List of log entries
+        
+    Returns:
+        dict: Dictionary with cache hit statistics
+    """
+    cache_hits = 0
+    total_queries = 0
+    
+    for entry in log_entries:
+        if entry.get('handler') == 'message_handler_result' and 'cache_hit' in entry:
+            total_queries += 1
+            if entry.get('cache_hit'):
+                cache_hits += 1
+    
+    if total_queries == 0:
+        return {}
+    
+    return {
+        'total': total_queries,
+        'hits': cache_hits,
+        'hit_rate': (cache_hits / total_queries) * 100
+    }
+
+def get_similarity_score_distribution(log_entries):
+    """
+    Get similarity score distribution.
+    
+    Args:
+        log_entries (list): List of log entries
+        
+    Returns:
+        dict: Dictionary with similarity score distribution
+    """
+    distribution = defaultdict(int)
+    
+    for entry in log_entries:
+        if entry.get('handler') == 'message_handler_result' and 'query_similarity' in entry:
+            similarity = entry['query_similarity']
+            if similarity >= 0.9:
+                distribution['0.9-1.0'] += 1
+            elif similarity >= 0.8:
+                distribution['0.8-0.9'] += 1
+            elif similarity >= 0.7:
+                distribution['0.7-0.8'] += 1
+            elif similarity >= 0.6:
+                distribution['0.6-0.7'] += 1
+            elif similarity >= 0.5:
+                distribution['0.5-0.6'] += 1
+            else:
+                distribution['<0.5'] += 1
+    
+    return dict(distribution)
+
+def get_query_length_stats(log_entries):
+    """
+    Get query length statistics.
+    
+    Args:
+        log_entries (list): List of log entries
+        
+    Returns:
+        dict: Dictionary with query length statistics
+    """
+    query_lengths = []
+    
+    for entry in log_entries:
+        if entry.get('handler') == 'message_handler' and 'query_length' in entry:
+            query_lengths.append(entry['query_length'])
+    
+    if not query_lengths:
+        return {}
+    
+    return {
+        'count': len(query_lengths),
+        'avg': sum(query_lengths) / len(query_lengths),
+        'min': min(query_lengths),
+        'max': max(query_lengths),
+        'median': sorted(query_lengths)[len(query_lengths) // 2]
+    }
+
 def export_to_csv(log_entries, output_file):
     """
     Export log entries to CSV format.
@@ -121,7 +233,8 @@ def export_to_csv(log_entries, output_file):
         return
         
     # Define CSV headers
-    headers = ['timestamp', 'level', 'logger', 'message', 'user_id', 'chat_id', 'message_id', 'handler']
+    headers = ['timestamp', 'level', 'logger', 'message', 'user_id', 'chat_id', 'message_id', 'handler', 
+               'query_similarity', 'response_time', 'cache_hit', 'query_length']
     
     # Try different encodings for CSV export
     encodings = ['utf-8', 'cp1251']
@@ -141,7 +254,11 @@ def export_to_csv(log_entries, output_file):
                         'user_id': entry.get('user_id', ''),
                         'chat_id': entry.get('chat_id', ''),
                         'message_id': entry.get('message_id', ''),
-                        'handler': entry.get('handler', '')
+                        'handler': entry.get('handler', ''),
+                        'query_similarity': entry.get('query_similarity', ''),
+                        'response_time': entry.get('response_time', ''),
+                        'cache_hit': entry.get('cache_hit', ''),
+                        'query_length': entry.get('query_length', '')
                     }
                     writer.writerow(row)
                     
@@ -228,111 +345,96 @@ def clear_stats(log_file_path, archive=True):
     # Summary
     print(f"\nStatistics cleared successfully!")
     if archive:
-        print(f"Files archived to: {archive_dir}")
+        print(f"Archived to: {archive_dir}")
     for file_info in cleared_files:
         print(f"  - {file_info}")
     
-    logger.info(f"Statistics cleared. Files processed: {len(cleared_files)}")
+    logger.info(f"Statistics clearing completed. Files processed: {len(cleared_files)}")
     return True
 
-def main():
-    parser = argparse.ArgumentParser(description="Aggregate and analyze bot statistics from JSON log files")
-    parser.add_argument('--log-file', '-l', 
-                        default='logs/bot.log',
-                        help='Path to the log file (default: logs/bot.log)')
-    parser.add_argument('--top-queries', '-t', 
-                        type=int, 
-                        default=20,
-                        help='Number of top queries to display (default: 20)')
-    parser.add_argument('--csv-export', '-c',
-                        help='Export to CSV file')
-    parser.add_argument('--csv-only', 
-                        action='store_true',
-                        help='Only export to CSV, do not display statistics')
-    parser.add_argument('--clear-stats', 
-                        action='store_true',
-                        help='Clear all statistics by archiving log files')
+def analyze_logs(log_file_path):
+    """
+    Analyze log files and generate detailed statistics.
     
-    args = parser.parse_args()
+    Args:
+        log_file_path (str): Path to the main log file
+    """
+    print("=== DETAILED STATISTICAL ANALYSIS ===")
     
-    # Handle stats clearing
-    if args.clear_stats:
-        print("Clearing statistics...")
-        # Use the default log file path
-        success = clear_stats('logs/bot.log')
-        if success:
-            print("Statistics cleared successfully!")
-        else:
-            print("Error clearing statistics!")
-        return
-    
-    # Resolve log file path
-    log_file_path = Path(args.log_file).resolve()
-    
-    # Check if log file exists
-    if not log_file_path.exists():
-        # Try relative to script location
-        script_dir = Path(__file__).parent
-        log_file_path = (script_dir.parent / args.log_file).resolve()
-        
-        if not log_file_path.exists():
-            print(f"⚠️  Warning: Log file not found: {args.log_file}")
-            print("📊 No statistics available yet. The bot may not have processed any requests.")
-            return
-    
-    print(f"Parsing log file: {log_file_path}")
-    
-    # Parse log entries
+    # Parse log file
     log_entries = parse_log_file(log_file_path)
     
     if not log_entries:
-        print("📊 No log entries found. Statistics will be available after the bot processes requests.")
+        print("No log entries found for analysis")
         return
     
-    print(f"Found {len(log_entries)} log entries")
+    print(f"Total log entries: {len(log_entries)}")
     
-    # Handle CSV export only mode
-    if args.csv_only and args.csv_export:
-        export_to_csv(log_entries, args.csv_export)
-        return
-    
-    # Display statistics
-    print("\n" + "="*50)
-    print("BOT STATISTICS")
-    print("="*50)
-    
+    # Get basic statistics
     total_requests = get_total_requests(log_entries)
     print(f"Total requests: {total_requests}")
     
-    print(f"\nTop {args.top_queries} queries:")
-    print("-" * 30)
-    top_queries = get_top_queries(log_entries, args.top_queries)
-    
+    # Get top queries
+    top_queries = get_top_queries(log_entries, 10)
     if top_queries:
+        print("\n=== TOP 10 POPULAR QUERIES ===")
         for i, (query, count) in enumerate(top_queries, 1):
-            print(f"{i:2d}. {query} ({count} times)")
-    else:
-        print("No queries found in logs")
+            print(f"{i}. {query} - {count} requests")
     
-    # Handle CSV export
-    if args.csv_export:
-        export_to_csv(log_entries, args.csv_export)
+    # Get response time statistics
+    response_stats = get_response_time_stats(log_entries)
+    if response_stats:
+        print("\n=== RESPONSE TIME STATISTICS ===")
+        print(f"Total queries with response time: {response_stats['count']}")
+        print(f"Average response time: {response_stats['avg']:.2f} ms")
+        print(f"Minimum response time: {response_stats['min']} ms")
+        print(f"Maximum response time: {response_stats['max']} ms")
+        print(f"Median response time: {response_stats['median']} ms")
+    
+    # Get cache hit statistics
+    cache_stats = get_cache_hit_stats(log_entries)
+    if cache_stats:
+        print("\n=== CACHE PERFORMANCE ===")
+        print(f"Total queries: {cache_stats['total']}")
+        print(f"Cache hits: {cache_stats['hits']}")
+        print(f"Cache hit rate: {cache_stats['hit_rate']:.2f}%")
+    
+    # Get similarity score distribution
+    similarity_dist = get_similarity_score_distribution(log_entries)
+    if similarity_dist:
+        print("\n=== SIMILARITY SCORE DISTRIBUTION ===")
+        for range_name, count in sorted(similarity_dist.items(), key=lambda x: x[0], reverse=True):
+            print(f"{range_name}: {count} queries")
+    
+    # Get query length statistics
+    length_stats = get_query_length_stats(log_entries)
+    if length_stats:
+        print("\n=== QUERY LENGTH STATISTICS ===")
+        print(f"Total queries with length data: {length_stats['count']}")
+        print(f"Average query length: {length_stats['avg']:.2f} characters")
+        print(f"Shortest query: {length_stats['min']} characters")
+        print(f"Longest query: {length_stats['max']} characters")
+        print(f"Median query length: {length_stats['median']} characters")
+
+def main():
+    parser = argparse.ArgumentParser(description="Aggregate and analyze bot statistics")
+    parser.add_argument("--log-file", default="logs/bot.log", help="Path to log file")
+    parser.add_argument("--export-csv", help="Export to CSV file")
+    parser.add_argument("--analyze", action="store_true", help="Perform detailed analysis")
+    parser.add_argument("--clear", action="store_true", help="Clear/archive statistics")
+    parser.add_argument("--no-archive", action="store_true", help="Delete instead of archiving when clearing")
+    
+    args = parser.parse_args()
+    
+    if args.analyze:
+        analyze_logs(args.log_file)
+    
+    if args.export_csv:
+        log_entries = parse_log_file(args.log_file)
+        export_to_csv(log_entries, args.export_csv)
+    
+    if args.clear:
+        clear_stats(args.log_file, archive=not args.no_archive)
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -223,7 +223,7 @@ class SecurityConfig:
 class MLConfig:
     """Machine Learning model configuration."""
     model_name: str = "ai-forever/ru-en-RoSBERTa"
-    similarity_threshold: float = 0.7
+    similarity_threshold: float = 0.75
     batch_size: int = 16  # Optimized for i5-4570
     cache_size: int = 500  # Optimized for 16GB RAM
     embedding_cache_size: int = 1000  # Optimized for 16GB RAM
@@ -276,7 +276,7 @@ class Config:
         
         self.ml = MLConfig(
             model_name=os.getenv("MODEL_NAME", "ai-forever/ru-en-RoSBERTa"),
-            similarity_threshold=self._get_float_env("SIMILARITY_THRESHOLD", 0.73),
+            similarity_threshold=self._get_float_env("SIMILARITY_THRESHOLD", 0.75),
             batch_size=self._get_int_env("BATCH_SIZE", 16),
             cache_size=self._get_int_env("CACHE_SIZE", 500),
             embedding_cache_size=self._get_int_env("EMBEDDING_CACHE_SIZE", 1000)
