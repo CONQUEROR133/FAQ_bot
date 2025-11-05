@@ -1,18 +1,19 @@
 import logging
 import os
+from typing import Set, Dict, Any, Optional, List, Tuple
 from aiogram import types, Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.exceptions import TelegramRetryAfter, TelegramNetworkError
 from aiogram.filters import Command, CommandStart
 
-from utils import send_file_with_retry, remove_keyboard, send_callback_answer
+from utils import send_file_with_retry, remove_keyboard, send_callback_answer, send_resource_files
 
 router = Router()
 
 # Dictionary to track users waiting for authentication
-waiting_for_password = set()
+waiting_for_password: Set[int] = set()
 
-def check_authentication(message: Message, db, config) -> bool:
+def check_authentication(message: Message, db: Any, config: Any) -> bool:
     """Check if user is authenticated"""
     if not message.from_user:
         return False
@@ -26,7 +27,7 @@ def check_authentication(message: Message, db, config) -> bool:
     # Check in database
     return db.is_user_authenticated(user_id)
 
-def check_authentication_for_callback(callback: CallbackQuery, db, config) -> bool:
+def check_authentication_for_callback(callback: CallbackQuery, db: Any, config: Any) -> bool:
     """Check authentication for callback query"""
     if not callback.from_user:
         return False
@@ -40,9 +41,7 @@ def check_authentication_for_callback(callback: CallbackQuery, db, config) -> bo
     # Check in database
     return db.is_user_authenticated(user_id)
 
-# retry_file_operation function moved to utils.py
-
-async def auto_send_single_resource(message: Message, resource):
+async def auto_send_single_resource(message: Message, resource: Dict[str, Any]) -> bool:
     """Automatically sends a single resource without confirmation"""
     try:
         if resource.get('type') == 'file':
@@ -51,31 +50,7 @@ async def auto_send_single_resource(message: Message, resource):
             if not files:
                 return False
             
-            sent_files = []
-            for file_path in files:
-                if not file_path or not os.path.exists(file_path):
-                    logging.warning(f"File not found: {file_path}")
-                    continue
-                    
-                # Check file size
-                try:
-                    file_size = os.path.getsize(file_path)
-                    if file_size > 50 * 1024 * 1024:  # 50MB
-                        logging.warning(f"File too large: {file_path}")
-                        continue
-                except OSError as e:
-                    logging.error(f"Error checking file size: {e}")
-                    continue
-                
-                # Send file with retries
-                try:
-                    await send_file_with_retry(message, file_path)
-                    sent_files.append(os.path.basename(file_path))
-                    logging.info(f"Successfully sent file: {file_path}")
-                except Exception as send_error:
-                    logging.error(f"Error auto-sending file: {send_error}")
-                    continue
-            
+            sent_files = await send_resource_files(message, files)
             # Send additional text if present
             if 'additional_text' in resource:
                 try:
@@ -105,7 +80,7 @@ async def auto_send_single_resource(message: Message, resource):
         logging.error(f"Error in auto_send_single_resource: {str(e)}")
         return False
 
-def should_auto_send_resource(resources):
+def should_auto_send_resource(resources: List[Dict[str, Any]]) -> Tuple[bool, Optional[Dict[str, Any]]]:
     """Determines if a resource should be sent automatically"""
     if not resources or len(resources) != 1:
         return False, None
@@ -128,7 +103,7 @@ def should_auto_send_resource(resources):
     
     return False, None
 
-def create_resource_selection_keyboard(match, index):
+def create_resource_selection_keyboard(match: Dict[str, Any], index: int) -> InlineKeyboardMarkup:
     """Creates a keyboard for resource selection"""
     keyboard = []
     
@@ -160,7 +135,7 @@ def create_resource_selection_keyboard(match, index):
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
 @router.callback_query(F.data.startswith("file_"))
-async def file_selection_callback(callback: CallbackQuery, faq_loader):
+async def file_selection_callback(callback: CallbackQuery, faq_loader: Any) -> None:
     """File selection handler"""
     try:
         # Check for callback.data presence
@@ -201,10 +176,11 @@ async def file_selection_callback(callback: CallbackQuery, faq_loader):
             await callback.answer("❌ File not found on disk")
             return
             
-        # Check file size (maximum 50MB for Telegram)
+        # Check file size (maximum configured size)
         try:
             file_size = os.path.getsize(file_path)
-            if file_size > 50 * 1024 * 1024:  # 50MB
+            max_file_size_bytes = config.MAX_FILE_SIZE_MB * 1024 * 1024
+            if file_size > max_file_size_bytes:
                 await callback.answer("❌ File too large")
                 return
         except OSError as e:
@@ -230,7 +206,7 @@ async def file_selection_callback(callback: CallbackQuery, faq_loader):
             logging.error(f"Error sending file: {send_error}")
             try:
                 await callback.answer("❌ Error sending file. Try again later.")
-            except:
+            except Exception:
                 pass  # If even callback.answer doesn't work
             return
         
@@ -242,7 +218,7 @@ async def file_selection_callback(callback: CallbackQuery, faq_loader):
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.callback_query(F.data.startswith("link_"))
-async def link_selection_callback(callback: CallbackQuery, faq_loader):
+async def link_selection_callback(callback: CallbackQuery, faq_loader: Any) -> None:
     """Link selection handler"""
     try:
         # Check for callback.data presence
@@ -281,7 +257,7 @@ async def link_selection_callback(callback: CallbackQuery, faq_loader):
             logging.error(f"Error sending link: {send_error}")
             try:
                 await callback.answer("❌ Error sending link")
-            except:
+            except Exception:
                 pass  # If even callback.answer doesn't work
             return
         
@@ -293,16 +269,8 @@ async def link_selection_callback(callback: CallbackQuery, faq_loader):
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.callback_query(F.data.startswith("tv_year_"))
-async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_loader):
+async def tv_year_selection_callback(callback: CallbackQuery, db: Any, config: Any, faq_loader: Any) -> None:
     """TV summary table year selection handler"""
-    # Check authentication
-    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
-        await callback.answer(
-            "🔒 Session expired. Run /start to re-authenticate.",
-            show_alert=True
-        )
-        return
-    
     try:
         # Check for callback.data presence
         if not callback.data:
@@ -364,7 +332,8 @@ async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_lo
                     # Check file size
                     try:
                         file_size = os.path.getsize(file_path)
-                        if file_size > 50 * 1024 * 1024:  # 50MB
+                        max_file_size_bytes = config.MAX_FILE_SIZE_MB * 1024 * 1024
+                        if file_size > max_file_size_bytes:
                             await callback.answer("❌ File too large")
                             return
                     except OSError as e:
@@ -403,16 +372,8 @@ async def tv_year_selection_callback(callback: CallbackQuery, db, config, faq_lo
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.callback_query(F.data.startswith("soundbar_year_"))
-async def soundbar_year_selection_callback(callback: CallbackQuery, db, config, faq_loader):
+async def soundbar_year_selection_callback(callback: CallbackQuery, db: Any, config: Any, faq_loader: Any) -> None:
     """Soundbar summary table year selection handler"""
-    # Check authentication
-    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
-        await callback.answer(
-            "🔒 Session expired. Run /start to re-authenticate.",
-            show_alert=True
-        )
-        return
-    
     try:
         # Check for callback.data presence
         if not callback.data:
@@ -474,7 +435,8 @@ async def soundbar_year_selection_callback(callback: CallbackQuery, db, config, 
                     # Check file size
                     try:
                         file_size = os.path.getsize(file_path)
-                        if file_size > 50 * 1024 * 1024:  # 50MB
+                        max_file_size_bytes = config.MAX_FILE_SIZE_MB * 1024 * 1024
+                        if file_size > max_file_size_bytes:
                             await callback.answer("❌ File too large")
                             return
                     except OSError as e:
@@ -513,15 +475,8 @@ async def soundbar_year_selection_callback(callback: CallbackQuery, db, config, 
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.callback_query(F.data.startswith("resource_"))
-async def resource_selection_callback(callback: CallbackQuery, faq_loader, db, config):
+async def resource_selection_callback(callback: CallbackQuery, faq_loader: Any, db: Any, config: Any) -> None:
     """Resource selection handler"""
-    # Check authentication
-    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
-        await callback.answer(
-            "🔒 Session expired. Run /start to re-authenticate.",
-            show_alert=True
-        )
-        return
     try:
         # Check for callback.data presence
         if not callback.data:
@@ -562,31 +517,7 @@ async def resource_selection_callback(callback: CallbackQuery, faq_loader, db, c
                 await callback.answer("❌ Files not found")
                 return
             
-            sent_files = []
-            for file_path in files:
-                if not file_path or not os.path.exists(file_path):
-                    logging.warning(f"File not found: {file_path}")
-                    continue
-                    
-                # Check file size
-                try:
-                    file_size = os.path.getsize(file_path)
-                    if file_size > 50 * 1024 * 1024:  # 50MB
-                        logging.warning(f"File too large: {file_path}")
-                        continue
-                except OSError as e:
-                    logging.error(f"Error checking file size: {e}")
-                    continue
-                
-                # Send file with retries on errors
-                try:
-                    await send_file_with_retry(callback.message, file_path)
-                    sent_files.append(os.path.basename(file_path))
-                    logging.info(f"Successfully sent file: {file_path}")
-                except Exception as send_error:
-                    logging.error(f"Error sending file: {send_error}")
-                    # Continue with next file
-                    continue
+            sent_files = await send_resource_files(callback.message, files)
             
             # Send additional text if present
             if 'additional_text' in resource:
@@ -598,12 +529,12 @@ async def resource_selection_callback(callback: CallbackQuery, faq_loader, db, c
             if sent_files:
                 try:
                     await callback.answer(f"✅ Sent: {', '.join(sent_files)}")
-                except:
+                except Exception:
                     pass
             else:
                 try:
                     await callback.answer("❌ Failed to send files")
-                except:
+                except Exception:
                     pass
                     
         elif resource.get('type') == 'link':
@@ -620,7 +551,7 @@ async def resource_selection_callback(callback: CallbackQuery, faq_loader, db, c
                 logging.error(f"Error sending link: {send_error}")
                 try:
                     await callback.answer("❌ Error sending link")
-                except:
+                except Exception:
                     pass
                 return
         
@@ -632,15 +563,8 @@ async def resource_selection_callback(callback: CallbackQuery, faq_loader, db, c
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.callback_query(F.data == "cancel")
-async def cancel_selection_callback(callback: CallbackQuery, db, config):
+async def cancel_selection_callback(callback: CallbackQuery, db: Any, config: Any) -> None:
     """Selection cancellation handler"""
-    # Check authentication
-    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
-        await callback.answer(
-            "🔒 Session expired. Run /start to re-authenticate.",
-            show_alert=True
-        )
-        return
     try:
         if callback.message and hasattr(callback.message, 'edit_text') and not isinstance(callback.message, types.InaccessibleMessage):
             await callback.message.edit_text("❌ Selection cancelled")
@@ -656,16 +580,8 @@ async def cancel_selection_callback(callback: CallbackQuery, db, config):
     await callback.answer()
 
 @router.callback_query(F.data == "vsk_pamytka")
-async def vsk_pamytka_callback(callback: CallbackQuery, db, config):
+async def vsk_pamytka_callback(callback: CallbackQuery, db: Any, config: Any) -> None:
     """VSK memo selection handler"""
-    # Check authentication
-    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
-        await callback.answer(
-            "🔒 Session expired. Run /start to re-authenticate.",
-            show_alert=True
-        )
-        return
-    
     try:
         # Check callback.message availability
         if not callback.message:
@@ -673,13 +589,14 @@ async def vsk_pamytka_callback(callback: CallbackQuery, db, config):
             return
         
         # Send memo file
-        file_path = "files/VSK_Insurance_Programs_Memo_sep_24.pdf"
+        file_path = config.VSK_MEMO_PATH
         
         if os.path.exists(file_path):
             # Check file size
             try:
                 file_size = os.path.getsize(file_path)
-                if file_size > 50 * 1024 * 1024:  # 50MB
+                max_file_size_bytes = config.MAX_FILE_SIZE_MB * 1024 * 1024
+                if file_size > max_file_size_bytes:
                     await callback.answer("❌ File too large")
                     return
             except OSError as e:
@@ -699,7 +616,7 @@ async def vsk_pamytka_callback(callback: CallbackQuery, db, config):
         else:
             await callback.answer("❌ File not found")
             return
-        
+            
         # Remove keyboard
         await remove_keyboard(callback.message)
         
@@ -708,16 +625,8 @@ async def vsk_pamytka_callback(callback: CallbackQuery, db, config):
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.callback_query(F.data == "vsk_zayavlenie")
-async def vsk_zayavlenie_callback(callback: CallbackQuery, db, config):
+async def vsk_zayavlenie_callback(callback: CallbackQuery, db: Any, config: Any) -> None:
     """VSK claim form selection handler"""
-    # Check authentication
-    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
-        await callback.answer(
-            "🔒 Session expired. Run /start to re-authenticate.",
-            show_alert=True
-        )
-        return
-    
     try:
         # Check callback.message availability
         if not callback.message:
@@ -726,34 +635,11 @@ async def vsk_zayavlenie_callback(callback: CallbackQuery, db, config):
         
         # Send claim form files
         files_to_send = [
-            "files/VSK_Claim_Form.docx",
-            "files/VSK_Insurance_Claim_Form.xlsx"
+            config.VSK_CLAIM_FORM_DOCX,
+            config.VSK_CLAIM_FORM_XLSX
         ]
         
-        sent_files = []
-        for file_path in files_to_send:
-            if os.path.exists(file_path):
-                # Check file size
-                try:
-                    file_size = os.path.getsize(file_path)
-                    if file_size > 50 * 1024 * 1024:  # 50MB
-                        logging.warning(f"File too large: {file_path}")
-                        continue
-                except OSError as e:
-                    logging.error(f"Error checking file size {file_path}: {e}")
-                    continue
-                
-                # Send file
-                try:
-                    await send_file_with_retry(callback.message, file_path)
-                    sent_files.append(os.path.basename(file_path))
-                    logging.info(f"Successfully sent file: {file_path}")
-                except Exception as send_error:
-                    logging.error(f"Error sending file {file_path}: {send_error}")
-                    # Continue with next file
-                    continue
-            else:
-                logging.warning(f"File not found: {file_path}")
+        sent_files = await send_resource_files(callback.message, files_to_send)
         
         # Send additional text
         additional_text = (
@@ -782,16 +668,8 @@ async def vsk_zayavlenie_callback(callback: CallbackQuery, db, config):
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.callback_query(F.data == "summary_tv")
-async def summary_tv_callback(callback: CallbackQuery, db, config):
+async def summary_tv_callback(callback: CallbackQuery, db: Any, config: Any) -> None:
     """TV summary table selection handler"""
-    # Check authentication
-    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
-        await callback.answer(
-            "🔒 Session expired. Run /start to re-authenticate.",
-            show_alert=True
-        )
-        return
-    
     try:
         # Check callback.message availability
         if not callback.message:
@@ -818,16 +696,8 @@ async def summary_tv_callback(callback: CallbackQuery, db, config):
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.callback_query(F.data == "summary_soundbar")
-async def summary_soundbar_callback(callback: CallbackQuery, db, config):
+async def summary_soundbar_callback(callback: CallbackQuery, db: Any, config: Any) -> None:
     """Soundbar summary table selection handler"""
-    # Check authentication
-    if not callback.from_user or not check_authentication_for_callback(callback, db, config):
-        await callback.answer(
-            "🔒 Session expired. Run /start to re-authenticate.",
-            show_alert=True
-        )
-        return
-    
     try:
         # Check callback.message availability
         if not callback.message:
@@ -854,7 +724,7 @@ async def summary_soundbar_callback(callback: CallbackQuery, db, config):
         await send_callback_answer(callback, "❌ An error occurred")
 
 @router.message(CommandStart())
-async def start_handler(message: Message, db, config):
+async def start_handler(message: Message, db: Any, config: Any) -> None:
     """/start command handler with authentication"""
     if not message.from_user:
         return
@@ -878,19 +748,19 @@ async def start_handler(message: Message, db, config):
     # Check authentication
     if check_authentication(message, db, config):
         await message.answer(
-            "🎉 Hi! I'm an FAQ bot for employees.\n"
-            "📝 Ask a question, and I'll find the information you need."
+            "🎉 Привет! Я FAQ-бот помощник для сотрудников.\n"
+            "📝 Задай вопрос, и я найду нужную информацию."
         )
     else:
         # User is not authenticated
         waiting_for_password.add(user_id)
         await message.answer(
-            "🔒 Authentication is required to access the bot.\n"
-            "📝 Please enter the access password:"
+            "🔒 Для доступа к боту требуется аутентификация.\n"
+            "📝 Введи пароль для доступа:"
         )
 
 @router.message(Command("help"))
-async def help_handler(message: Message, db, config):
+async def help_handler(message: Message, db: Any, config: Any) -> None:
     """/help command handler with authentication check"""
     if not message.from_user:
         return
@@ -917,112 +787,219 @@ async def help_handler(message: Message, db, config):
             "🔒 To access the bot, run the /start command and enter the password."
         )
         return
-        
+    
     help_text = (
-        "🤖 <b>Bot Help</b>\n\n"
-        "📝 Just ask a question, and I'll try to find an answer in the knowledge base.\n\n"
-        "🛠️ Available commands:\n"
-        "/start - Start dialog\n"
-        "/help - Get help\n"
+        "🤖 <b>FAQ Bot Commands</b>\n\n"
+        "/start - Start the bot and authenticate\n"
+        "/help - Show this help message\n"
+        "/stats - Show usage statistics\n"
+        "/export_stats - Export detailed statistics\n"
+        "/clear_stats - Clear statistics (admin only)\n"
+        "/access - Manage user access (admin only)\n\n"
+        "📝 Simply send a question in natural language and I'll find the most relevant answer for you."
     )
     
-    # Add admin commands if user is admin
-    if message.from_user and message.from_user.id == config.ADMIN_ID:
-        help_text += (
-            "\n🔧 <b>Admin commands:</b>\n"
-            "/stats - Work statistics\n"
-            "/export_stats - Export full statistics\n"
-            "/auth_users - Authentication management\n"
-        )
-    
-    help_text += "\n🔒 Bot is available only to authenticated employees."
-    await message.answer(help_text, parse_mode="HTML")
+    await message.answer(help_text, parse_mode='HTML')
 
-# Command handlers must be ABOVE text handler
 @router.message(Command("stats"))
-async def stats_handler(
-    message: Message, 
-    db,
-    config
-):
-    if not message.from_user or message.from_user.id != config.ADMIN_ID:
-        await message.answer("You don't have permission to execute this command.")
+async def stats_handler(message: Message, db: Any, config: Any) -> None:
+    """Command to show statistics"""
+    if not message.from_user:
         return
-
+    
+    user_id = message.from_user.id
+    chat_id = message.chat.id if message.chat else None
+    message_id = message.message_id
+    
+    # Custom logging with required fields
+    import logging
+    logging.getLogger().info(
+        "Stats command received",
+        extra={
+            'user_id': user_id,
+            'chat_id': chat_id,
+            'message_id': message_id,
+            'handler': 'stats_handler'
+        }
+    )
+    
+    # Check authentication
+    if not check_authentication(message, db, config):
+        await message.answer(
+            "🔒 To access the bot, run the /start command and enter the password."
+        )
+        return
+    
     try:
         stats = db.get_stats()
-        response = (
-            "📊 <b>Bot Statistics</b>\n\n"
-            f"• Total requests: <b>{stats.total_queries}</b>\n"
-            f"• Successful responses: <b>{stats.success_rate:.2f}%</b>\n"
-            f"• Unanswered questions: <b>{stats.unanswered_questions}</b>\n"
-            f"• Swear words detected: <b>{stats.bad_words_count}</b>\n"
-            f"🔒 Authenticated users: <b>{stats.authenticated_users_count}</b>\n\n"
-            "🔝 <b>Top 5 popular queries:</b>\n"
+        
+        # Format similarity score distribution
+        similarity_distribution = ""
+        if stats.similarity_score_distribution:
+            similarity_distribution = "\n📊 <b>Similarity Score Distribution:</b>\n"
+            for range_name, count in sorted(stats.similarity_score_distribution.items(), 
+                                           key=lambda x: x[0], reverse=True):
+                similarity_distribution += f"  {range_name}: {count} queries\n"
+        
+        # Format popular queries
+        popular_queries = ""
+        if stats.popular_queries:
+            popular_queries = "\n🔥 <b>Top 10 Popular Queries:</b>\n"
+            for i, (query, count) in enumerate(stats.popular_queries, 1):
+                popular_queries += f"  {i}. {query} ({count} times)\n"
+        
+        stats_message = (
+            f"📈 <b>Bot Statistics</b>\n\n"
+            f"Total queries: <b>{stats.total_queries}</b>\n"
+            f"Success rate: <b>{stats.success_rate:.2f}%</b>\n"
+            f"Unanswered questions: <b>{stats.unanswered_questions}</b>\n"
+            f"Bad words detected: <b>{stats.bad_words_count}</b>\n"
+            f"Authenticated users: <b>{stats.authenticated_users_count}</b>\n"
+            f"Average response time: <b>{stats.avg_response_time:.2f} ms</b>\n"
+            f"Cache hit rate: <b>{stats.cache_hit_rate:.2f}%</b>\n"
+            f"Average query length: <b>{stats.avg_query_length:.2f} characters</b>\n"
+            f"{similarity_distribution}"
+            f"{popular_queries}"
         )
         
-        for i, (query, count) in enumerate(stats.popular_queries[:5], 1):
-            response += f"{i}. {query} - <b>{count}</b> requests\n"
-            
-        await message.answer(response, parse_mode='HTML')
+        await message.answer(stats_message, parse_mode='HTML')
         
     except Exception as e:
-        logging.error(f"Error getting statistics: {str(e)}")
-        await message.answer("⚠ An error occurred while getting statistics.")
+        logging.error(f"Error getting stats: {str(e)}")
+        await message.answer("⚠️ An error occurred while retrieving statistics.")
 
 @router.message(Command("export_stats"))
-async def export_stats_handler(
-    message: Message, 
-    db,
-    config
-):
-    if not message.from_user or message.from_user.id != config.ADMIN_ID:
-        await message.answer("⛔ You don't have permission to execute this command.")
+async def export_stats_handler(message: Message, db: Any, config: Any) -> None:
+    """Command to export statistics"""
+    if not message.from_user:
         return
-        
+    
+    user_id = message.from_user.id
+    chat_id = message.chat.id if message.chat else None
+    message_id = message.message_id
+    
+    # Custom logging with required fields
+    import logging
+    logging.getLogger().info(
+        "Export stats command received",
+        extra={
+            'user_id': user_id,
+            'chat_id': chat_id,
+            'message_id': message_id,
+            'handler': 'export_stats_handler'
+        }
+    )
+    
+    # Check authentication
+    if not check_authentication(message, db, config):
+        await message.answer(
+            "🔒 To access the bot, run the /start command and enter the password."
+        )
+        return
+    
     try:
         filename = db.export_stats_to_file()
-        
-        await send_file_with_retry(message, filename)
-        os.remove(filename)
-        logging.info("Successfully sent statistics file")
+        if filename and os.path.exists(filename):
+            # Send file
+            try:
+                await message.answer_document(types.FSInputFile(filename))
+                # Clean up the file after sending
+                os.remove(filename)
+            except Exception as e:
+                logging.error(f"Error sending stats file: {str(e)}")
+                await message.answer("⚠️ An error occurred while sending the statistics file.")
+        else:
+            await message.answer("⚠️ Failed to export statistics.")
+            
     except Exception as e:
-        logging.error(f"Error exporting statistics: {str(e)}")
-        await message.answer("⚠ An error occurred while exporting statistics.")
+        logging.error(f"Error exporting stats: {str(e)}")
+        await message.answer("⚠️ An error occurred while exporting statistics.")
 
-@router.message(Command("auth_users"))
-async def auth_users_handler(
+@router.message(Command("access"))
+async def access_handler(
     message: Message, 
-    db,
-    config
-):
-    """Command to view authenticated users (admin only)"""
-    if not message.from_user or message.from_user.id != config.ADMIN_ID:
-        await message.answer("⛔ You don't have permission to execute this command.")
+    db: Any,
+    config: Any
+) -> None:
+    """Command to manage user access (admin only)"""
+    if not message.from_user:
+        return
+    
+    user_id = message.from_user.id
+    chat_id = message.chat.id if message.chat else None
+    message_id = message.message_id
+    
+    # Custom logging with required fields
+    import logging
+    logging.getLogger().info(
+        "Access command received",
+        extra={
+            'user_id': user_id,
+            'chat_id': chat_id,
+            'message_id': message_id,
+            'handler': 'access_handler'
+        }
+    )
+    
+    # Check authentication and admin rights
+    if not check_authentication(message, db, config):
+        await message.answer(
+            "🔒 To access the bot, run the /start command and enter the password."
+        )
+        return
+    
+    if message.from_user.id != config.ADMIN_ID:
+        await message.answer("⛔ У тебя нет прав на эту команду.")
         return
 
     try:
         auth_count = db.get_authenticated_users_count()
         await message.answer(
-            f"🔒 <b>Authentication Management</b>\n\n"
-            f"👥 Total authenticated users: <b>{auth_count}</b>\n\n"
-            f"📋 To get the full list, use /export_stats",
+            f"🔒 <b>Управление доступом</b>\n\n"
+            f"👥 Всего пользователей с доступом: <b>{auth_count}</b>\n\n"
+            f"📋 Чтобы посмотреть полный список, используй команду /export_stats",
             parse_mode='HTML'
         )
         
     except Exception as e:
         logging.error(f"Error getting user list: {str(e)}")
-        await message.answer("⚠ An error occurred while getting the user list.")
+        await message.answer("⚠️ При получении списка пользователей произошла ошибка.")
 
 @router.message(Command("clear_stats"))
 async def clear_stats_handler(
     message: Message, 
-    db,
-    config
-):
+    db: Any,
+    config: Any
+) -> None:
     """Command to clear statistics (admin only)"""
-    if not message.from_user or message.from_user.id != config.ADMIN_ID:
-        await message.answer("⛔ You don't have permission to execute this command.")
+    if not message.from_user:
+        return
+    
+    user_id = message.from_user.id
+    chat_id = message.chat.id if message.chat else None
+    message_id = message.message_id
+    
+    # Custom logging with required fields
+    import logging
+    logging.getLogger().info(
+        "Clear stats command received",
+        extra={
+            'user_id': user_id,
+            'chat_id': chat_id,
+            'message_id': message_id,
+            'handler': 'clear_stats_handler'
+        }
+    )
+    
+    # Check authentication and admin rights
+    if not check_authentication(message, db, config):
+        await message.answer(
+            "🔒 To access the bot, run the /start command and enter the password."
+        )
+        return
+    
+    if message.from_user.id != config.ADMIN_ID:
+        await message.answer("⛔ У тебя нет прав на эту команду.")
         return
     
     # Create confirmation keyboard
@@ -1032,17 +1009,17 @@ async def clear_stats_handler(
     ])
     
     await message.answer(
-        "⚠️ <b>Clear Statistics</b>\n\n"
-        "This will archive all log files and start fresh statistics.\n"
-        "Are you sure you want to proceed?",
+        "⚠️ <b>Обнуление статистики</b>\n\n"
+        "Все файлы логов будут заархивированы, а статистика начнётся заново.\n"
+        "Ты точно хочешь продолжить?",
         parse_mode='HTML',
         reply_markup=keyboard
     )
 
 @router.callback_query(F.data == "clear_stats_confirm")
-async def clear_stats_confirm_callback(callback: CallbackQuery, db, config):
+async def clear_stats_confirm_callback(callback: CallbackQuery, db: Any, config: Any) -> None:
     """Callback handler for confirming stats clearing"""
-    # Check authentication
+    # Check authentication and admin rights
     if not callback.from_user or callback.from_user.id != config.ADMIN_ID:
         await callback.answer("⛔ You don't have permission to execute this command.", show_alert=True)
         return
@@ -1101,9 +1078,9 @@ async def clear_stats_confirm_callback(callback: CallbackQuery, db, config):
         await callback.answer("Error clearing statistics", show_alert=True)
 
 @router.callback_query(F.data == "clear_stats_cancel")
-async def clear_stats_cancel_callback(callback: CallbackQuery, db, config):
+async def clear_stats_cancel_callback(callback: CallbackQuery, db: Any, config: Any) -> None:
     """Callback handler for canceling stats clearing"""
-    # Check authentication
+    # Check authentication and admin rights
     if not callback.from_user or callback.from_user.id != config.ADMIN_ID:
         await callback.answer("⛔ You don't have permission to execute this command.", show_alert=True)
         return
@@ -1115,9 +1092,9 @@ async def clear_stats_cancel_callback(callback: CallbackQuery, db, config):
 @router.message(F.text.func(lambda text: text and "сводная" in text.lower() and "тв" in text.lower()))
 async def tv_summary_handler(
     message: Message, 
-    db,
-    config
-):
+    db: Any,
+    config: Any
+) -> None:
     """Handler for "TV Summary" requests - shows year selection buttons"""
     if not message.text or not (text := message.text.strip()):
         return
@@ -1145,9 +1122,9 @@ async def tv_summary_handler(
 @router.message(F.text.func(lambda text: text and "сводная" in text.lower() and "саундбар" in text.lower()))
 async def soundbar_summary_handler(
     message: Message, 
-    db,
-    config
-):
+    db: Any,
+    config: Any
+) -> None:
     """Handler for "Soundbar Summary" requests - shows year selection buttons"""
     if not message.text or not (text := message.text.strip()):
         return
@@ -1175,9 +1152,9 @@ async def soundbar_summary_handler(
 @router.message(F.text.func(lambda text: text and "вск" in text.lower()))
 async def vsk_handler(
     message: Message, 
-    db,
-    config
-):
+    db: Any,
+    config: Any
+) -> None:
     """Handler for "VSK" requests - shows document selection buttons"""
     if not message.text or not (text := message.text.strip()):
         return
@@ -1205,9 +1182,9 @@ async def vsk_handler(
 @router.message(F.text.func(lambda text: text and "сводная" in text.lower() and "тв" not in text.lower() and "саундбар" not in text.lower()))
 async def summary_choice_handler(
     message: Message, 
-    db,
-    config
-):
+    db: Any,
+    config: Any
+) -> None:
     """Handler for "Summary" requests - shows selection buttons between TV and soundbar"""
     if not message.text or not (text := message.text.strip()):
         return
@@ -1235,10 +1212,10 @@ async def summary_choice_handler(
 @router.message(F.text.func(lambda text: text and any(keyword in text.lower() for keyword in ["чек-лист", "чек лист", "проверка"])))
 async def checklist_handler(
     message: Message, 
-    db,
-    config,
-    faq_loader
-):
+    db: Any,
+    config: Any,
+    faq_loader: Any
+) -> None:
     """Handler for "Checklist", "Check list", "Verification" requests - shows selection buttons"""
     if not message.text or not (text := message.text.strip()):
         return
@@ -1302,10 +1279,10 @@ async def checklist_handler(
 @router.message(F.text.func(lambda text: text and any(keyword in text.lower() for keyword in ["сканер", "подключение сканеров", "netum"])))
 async def scanner_handler(
     message: Message, 
-    db,
-    config,
-    faq_loader
-):
+    db: Any,
+    config: Any,
+    faq_loader: Any
+) -> None:
     """Handler for "Scanner", "Scanner Connection", "Netum" requests - automatically sends files"""
     if not message.text or not (text := message.text.strip()):
         return
@@ -1361,10 +1338,10 @@ async def scanner_handler(
 @router.message(F.text)
 async def message_handler(
     message: Message, 
-    db,
-    faq_loader,
-    config
-):
+    db: Any,
+    faq_loader: Any,
+    config: Any
+) -> None:
     if not message.text or not (text := message.text.strip()):
         await message.answer("Please send a text question.")
         return

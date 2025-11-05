@@ -8,7 +8,7 @@ from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
 from config import config
 from database import Database
 from faq_loader import FAQLoader  # type: ignore
-from handlers import router
+from handlers import router, waiting_for_password
 from health import router as health_router
 from middlewares import DependenciesMiddleware
 from auth_middleware import AuthenticationMiddleware
@@ -161,8 +161,20 @@ async def main():
         embeddings_file=config.EMBEDDINGS_FILE,
         index_file=config.INDEX_FILE
     )
-    faq_loader.load_faq()
-    faq_loader.create_embeddings()
+    
+    # Load FAQ with proper error handling
+    try:
+        faq_loader.load_faq()
+    except Exception as e:
+        logging.error(f"Failed to load FAQ data: {e}")
+        raise RuntimeError(f"FAQ loading failed: {e}") from e
+    
+    # Create embeddings with proper error handling
+    try:
+        faq_loader.create_embeddings()
+    except Exception as e:
+        logging.error(f"Failed to create embeddings: {e}")
+        raise RuntimeError(f"Embeddings creation failed: {e}") from e
 
     # Register middleware for dependency injection
     deps_middleware = DependenciesMiddleware(
@@ -171,11 +183,17 @@ async def main():
         config_instance=config
     )
     
-    # Note: AuthenticationMiddleware is temporarily disabled as it blocks password input
-    # Authentication is handled at the handler level in handlers.py
+    # Register authentication middleware
+    auth_middleware = AuthenticationMiddleware(
+        db_instance=db,
+        config_instance=config,
+        waiting_for_password=waiting_for_password
+    )
     
     router.message.outer_middleware(deps_middleware)
     router.callback_query.outer_middleware(deps_middleware)
+    router.message.outer_middleware(auth_middleware)
+    router.callback_query.outer_middleware(auth_middleware)
     dp.include_router(router)
     dp.include_router(health_router)
 

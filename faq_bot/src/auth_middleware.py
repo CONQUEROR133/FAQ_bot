@@ -1,14 +1,22 @@
 from aiogram import BaseMiddleware
-from typing import Callable, Awaitable, Any, Dict
+from typing import Callable, Awaitable, Any, Dict, Set
 from aiogram.types import Message, CallbackQuery
 import logging
 
 class AuthenticationMiddleware(BaseMiddleware):
-    """Middleware for checking user authentication"""
+    """Middleware for checking user authentication."""
     
-    def __init__(self, db_instance, config_instance):
+    def __init__(self, db_instance, config_instance, waiting_for_password: Set[int]):
+        """Initialize the authentication middleware.
+        
+        Args:
+            db_instance: Database instance for authentication checks
+            config_instance: Configuration instance
+            waiting_for_password: Set of user IDs waiting for password input
+        """
         self.db = db_instance
         self.config = config_instance
+        self.waiting_for_password = waiting_for_password
 
     async def __call__(
         self,
@@ -16,6 +24,16 @@ class AuthenticationMiddleware(BaseMiddleware):
         event: Any,
         data: Dict[str, Any]
     ) -> Any:
+        """Process the event and check user authentication.
+        
+        Args:
+            handler: Next handler in the chain
+            event: Telegram event (Message or CallbackQuery)
+            data: Data dictionary to pass to handlers
+            
+        Returns:
+            Any: Result of the handler execution or None if authentication failed
+        """
         # Get user from event
         user = None
         if isinstance(event, (Message, CallbackQuery)):
@@ -35,26 +53,20 @@ class AuthenticationMiddleware(BaseMiddleware):
             return await handler(event, data)
         
         # Check if user is waiting for password input
-        # Import waiting_for_password from handlers
-        try:
-            from handlers import waiting_for_password
-            if user and user.id in waiting_for_password:
-                # User is waiting for password input - allow processing
-                return await handler(event, data)
-        except ImportError:
-            # If we can't import, continue without checking
-            pass
+        if user and user.id in self.waiting_for_password:
+            # User is waiting for password input - allow processing
+            return await handler(event, data)
         
         # Check authentication in database
         if user and not self.db.is_user_authenticated(user.id):
             # User is not authenticated
             if isinstance(event, Message):
                 await event.answer(
-                    "🔒 To access the bot, run the /start command and enter the password."
+                    "🔒 Чтобы войти в бота, введи команду /start и укажи пароль."
                 )
             elif isinstance(event, CallbackQuery):
                 await event.answer(
-                    "🔒 Session expired. Run /start to re-authenticate.",
+                    "🔒 Сессия истекла. Введи /start для повторного входа.",
                     show_alert=True
                 )
             

@@ -22,7 +22,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-08-26T21:47:29.000000",
       "hash": "GalaxyUP"
     }
@@ -53,7 +53,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-08-26T21:47:29.000000",
       "hash": "alpha_insurance"
     }
@@ -80,7 +80,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.7,
+      "confidence": 0.66,
       "processed_at": "2025-08-26T21:47:29.000000",
       "hash": "installment_1c"
     }
@@ -103,7 +103,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "tv_2024_summary"
     }
@@ -112,6 +112,9 @@
     "query": "Сводная таблица ТВ 2025",
     "variations": [
       "Сводная ТВ 25",
+      "Тв",
+      "тв",
+      "ТВ",
       "Сводная таблица ТВ 2025",
       "Таблица ТВ 2025",
       "ТВ 2025"
@@ -126,7 +129,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "tv_2025_summary"
     }
@@ -136,6 +139,8 @@
     "variations": [
       "Сводная тв",
       "ТВ",
+      "Тв",
+      "тв",
       "Телевизоры"
     ],
     "response": "Выберите год сводной таблицы ТВ:",
@@ -153,7 +158,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "tv_summary"
     }
@@ -176,7 +181,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "soundbar_2024_summary"
     }
@@ -199,7 +204,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "soundbar_2025_summary"
     }
@@ -225,7 +230,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "soundbar_summary"
     }
@@ -253,7 +258,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "vsk_insurance"
     }
@@ -281,7 +286,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "unisafe_presentation"
     }
@@ -298,7 +303,7 @@
     "resources": [],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "discount_policy"
     }
@@ -320,7 +325,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "lampa_setup"
     }
@@ -338,7 +343,7 @@
     "resources": [],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "msx_setup"
     }
@@ -367,7 +372,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "windows_localization"
     }
@@ -390,7 +395,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "halva_app"
     }
@@ -412,7 +417,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "vpn_samsung"
     }
@@ -432,7 +437,7 @@
     "resources": [],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "retail_mode"
     }
@@ -456,7 +461,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "audit_romir"
     }
@@ -480,7 +485,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "samsung_health"
     }
@@ -501,7 +506,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-08T10:00:00.000000",
       "hash": "installment_completion"
     }
@@ -527,7 +532,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-27T23:00:00.000000",
       "hash": "scanner_netum"
     }
@@ -556,7 +561,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-27T23:00:00.000000",
       "hash": "checklist"
     }
@@ -582,7 +587,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-27T23:00:00.000000",
       "hash": "platinum_security"
     }
@@ -607,7 +612,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-27T23:00:00.000000",
       "hash": "trade_in"
     }
@@ -630,7 +635,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-27T23:00:00.000000",
       "hash": "categories"
     }
@@ -658,7 +663,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-27T23:00:00.000000",
       "hash": "invoice_documents"
     }
@@ -679,7 +684,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-28T00:00:00.000000",
       "hash": "belmont"
     }
@@ -701,7 +706,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-28T00:00:00.000000",
       "hash": "realization_sdal_kupil"
     }
@@ -726,7 +731,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-28T00:00:00.000000",
       "hash": "realization"
     }
@@ -751,7 +756,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-28T00:00:00.000000",
       "hash": "secret_shopper_questionnaire"
     }
@@ -772,7 +777,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-28T00:00:00.000000",
       "hash": "black_seal"
     }
@@ -793,7 +798,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-28T00:00:00.000000",
       "hash": "ktu"
     }
@@ -808,7 +813,7 @@
     "resources": [],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-09-28T00:00:00.000000",
       "hash": "badge"
     }
@@ -833,7 +838,7 @@
     ],
     "metadata": {
       "source_type": "manual",
-      "confidence": 0.95,
+      "confidence": 0.66,
       "processed_at": "2025-11-04T12:00:00.000000",
       "hash": "thanks_gif"
     }

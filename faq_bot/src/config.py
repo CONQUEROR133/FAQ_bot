@@ -223,7 +223,7 @@ class SecurityConfig:
 class MLConfig:
     """Machine Learning model configuration."""
     model_name: str = "ai-forever/ru-en-RoSBERTa"
-    similarity_threshold: float = 0.75
+    similarity_threshold: float = 0.66
     batch_size: int = 16  # Optimized for i5-4570
     cache_size: int = 500  # Optimized for 16GB RAM
     embedding_cache_size: int = 1000  # Optimized for 16GB RAM
@@ -238,6 +238,20 @@ class MLConfig:
             raise ValueError("Cache size must be positive")
         if self.embedding_cache_size <= 0:
             raise ValueError("Embedding cache size must be positive")
+
+
+@dataclass
+class FileConfig:
+    """File handling configuration."""
+    max_file_size_mb: int = 50
+    vsk_memo_path: str = "files/VSK_Insurance_Programs_Memo_sep_24.pdf"
+    vsk_claim_form_docx: str = "files/VSK_Claim_Form.docx"
+    vsk_claim_form_xlsx: str = "files/VSK_Insurance_Claim_Form.xlsx"
+    
+    def __post_init__(self):
+        """Validate file configuration values."""
+        if self.max_file_size_mb <= 0:
+            raise ValueError("Max file size must be positive")
 
 
 class Config:
@@ -276,11 +290,13 @@ class Config:
         
         self.ml = MLConfig(
             model_name=os.getenv("MODEL_NAME", "ai-forever/ru-en-RoSBERTa"),
-            similarity_threshold=self._get_float_env("SIMILARITY_THRESHOLD", 0.75),
+            similarity_threshold=self._get_float_env("SIMILARITY_THRESHOLD", 0.66),
             batch_size=self._get_int_env("BATCH_SIZE", 16),
             cache_size=self._get_int_env("CACHE_SIZE", 500),
             embedding_cache_size=self._get_int_env("EMBEDDING_CACHE_SIZE", 1000)
         )
+        
+        self.files = FileConfig()
         
         # Backward compatibility properties
         self._setup_backward_compatibility()
@@ -352,6 +368,12 @@ class Config:
         # ML settings (backward compatibility)
         self.MODEL_NAME = self.ml.model_name
         self.SIMILARITY_THRESHOLD = self.ml.similarity_threshold
+        
+        # File settings (backward compatibility)
+        self.MAX_FILE_SIZE_MB = self.files.max_file_size_mb
+        self.VSK_MEMO_PATH = self.files.vsk_memo_path
+        self.VSK_CLAIM_FORM_DOCX = self.files.vsk_claim_form_docx
+        self.VSK_CLAIM_FORM_XLSX = self.files.vsk_claim_form_xlsx
     
     def validate(self) -> bool:
         """Validate entire configuration."""
